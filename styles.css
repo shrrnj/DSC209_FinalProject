@@ -1,0 +1,53 @@
+:root{
+    --bg:#fff; --panel:#f7f8fb; --ink:#111; --muted:#5d6778; --grid:#d6dae2; --shadow:rgba(0,0,0,.08);
+    --chip-bg:#ffffff; --chip-border:#d9dee8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b0d12; --panel:#121620; --ink:#e9edf3; --muted:#93a2b5; --grid:#2b3241; --shadow:rgba(0,0,0,.35);
+      --chip-bg:#151a25; --chip-border:#334055;
+    }
+  }
+  
+  *{box-sizing:border-box}
+  body{margin:0; font:14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--ink); background:var(--bg);}
+  .wrap{max-width:1100px; margin:24px auto; padding:0 16px;}
+  .top h1{margin:0 0 4px; font-size:22px}
+  .sub{margin:0 0 12px; color:var(--muted)}
+  
+  .controls{display:flex; gap:14px; flex-wrap:wrap; align-items:end; margin-bottom:10px}
+  label{color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center}
+  select{accent-color:#3b82f6}
+  
+  /* Chips */
+  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:2px 0 12px}
+  .chip{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; cursor:pointer;
+    background:var(--chip-bg); border:1px solid var(--chip-border); user-select:none;
+  }
+  .chip .sw{width:10px; height:10px; border-radius:3px; background:#9aa4b2}
+  .chip.active{outline:2px solid #3b82f6; outline-offset:1px}
+  .chipnote{margin:0 0 8px; color:var(--muted); font-size:12px}
+  
+  /* Card + legend + chart */
+  .card{background:var(--panel); border:1px solid color-mix(in srgb, var(--grid) 80%, transparent); border-radius:16px; padding:12px}
+  h2{margin:0 0 6px; font-size:16px}
+  .note{color:var(--muted); font-size:12px; margin:8px 0 0}
+  
+  .legend{display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 6px}
+  .legend .item{display:flex; gap:6px; align-items:center; padding:4px 8px; border:1px solid color-mix(in srgb, var(--grid) 80%, transparent); border-radius:999px; background:color-mix(in srgb, var(--panel) 85%, white 15%);}
+  .sw{width:12px; height:12px; border-radius:3px; display:inline-block}
+  
+  svg{width:100%; height:auto; display:block}
+  .axis text{fill:var(--muted); font-size:11px}
+  .axis path,.axis line{stroke:var(--grid)}
+  
+  /* Tooltip */
+  .tooltip{
+    position:fixed; pointer-events:none;
+    background:color-mix(in srgb, var(--panel) 85%, black 15%); color:var(--ink);
+    border:1px solid color-mix(in srgb, var(--grid) 70%, transparent);
+    border-radius:10px; padding:8px 10px; font-size:12px; box-shadow:0 8px 24px var(--shadow);
+    opacity:0; transform:translate3d(0,0,0);
+    max-width:320px; z-index:999;
+  }

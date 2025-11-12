@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GHG · Snapshot — Multi-Year Chips</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="./styles.css?v=5" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <h1>GHG · Snapshot — Region × (Industry | Gas)</h1>
+      <p class="sub">
+        Pick a region, choose <b>Industries</b> or <b>Gases</b>, then select one or more <b>years</b> below.
+        Stacks show the opposite dimension. Values are summed over selected years.
+      </p>
+    </header>
+
+    <section class="controls">
+      <label>Region
+        <select id="regionSel">
+          <option>Advanced Economies</option>
+          <option>Africa</option>
+          <option>Americas</option>
+          <option>Asia</option>
+          <option>Australia and New Zealand</option>
+          <option>Central Asia</option>
+          <option>Eastern Asia</option>
+          <option>Eastern Europe</option>
+          <option>Emerging and Developing Economies</option>
+          <option>Europe</option>
+          <option>G20</option>
+          <option>G7</option>
+          <option>Latin America and the Caribbean</option>
+          <option>Northern Africa</option>
+          <option>Northern America</option>
+          <option>Northern Europe</option>
+          <option>Oceania</option>
+          <option>Other Oceania sub-regions</option>
+          <option>South-eastern Asia</option>
+          <option>Southern Asia</option>
+          <option>Southern Europe</option>
+          <option>Sub-Saharan Africa</option>
+          <option>Western Asia</option>
+          <option>Western Europe</option>
+          <option selected>World</option>
+        </select>
+      </label>
+
+      <label>Compare by
+        <select id="modeSel">
+          <option value="industry">Industry</option>
+          <option value="gas">Gas</option>
+        </select>
+      </label>
+    </section>
+
+    <section>
+      <div class="chipbar" id="yearChips" aria-label="Select one or more years"></div>
+      <p class="chipnote" id="yearsSummary"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="snapTitle">Snapshot</h2>
+      <div id="legendMain" class="legend"></div>
+      <svg id="chartMain" viewBox="0 0 960 560" aria-label="Stacked horizontal bars"></svg>
+      <p class="note">Hover for details. Values are the <b>sum</b> across selected years.</p>
+    </section>
+  </main>
+
+  <div id="tooltip" class="tooltip" style="opacity:0"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script defer src="./app.js?v=5"></script>
+</body>
+</html>
