@@ -188,3 +188,368 @@ d3.csv(FILE).then(raw => {
   renderYearChips();
   update();
 });
+
+
+// ============================
+// Line Chart: Gas Emissions by Continent
+// ============================
+d3.csv("data/Indicator_1_1_annual_6562429754166382300.csv").then(function(data) {
+
+  // --- 1. Filter for continent-level rows ---
+  const continents = ["Africa", "Asia", "Europe", "Oceania", "Americas"];
+  const filteredData = data.filter(d => continents.includes(d.Country));
+
+  // --- 2. Convert data to long form ---
+  const years = d3.range(2010, 2024);
+  let longData = [];
+  filteredData.forEach(d => {
+    years.forEach(y => {
+      longData.push({
+        Country: d.Country,
+        GasType: d["Gas Type"],
+        Year: +y,
+        Value: +d[y]
+      });
+    });
+  });
+
+  // --- 3. Flatten grouped data (sum duplicates if any) ---
+  const grouped = d3.rollups(
+    longData,
+    v => d3.sum(v, d => d.Value),
+    d => d.Country,
+    d => d.GasType,
+    d => d.Year
+  );
+
+  const flatData = [];
+  grouped.forEach(([country, gasMap]) => {
+    gasMap.forEach(([gas, yearMap]) => {
+      yearMap.forEach(([year, value]) => {
+        flatData.push({Country: country, GasType: gas, Year: +year, Value: +value});
+      });
+    });
+  });
+
+  // --- 4. Dropdown for Gas Types ---
+  const gasTypes = Array.from(new Set(flatData.map(d => d.GasType)));
+  const dropdown = d3.select("#gasDropdown");
+  dropdown.selectAll("option")
+    .data(gasTypes)
+    .join("option")
+    .attr("value", d => d)
+    .text(d => d);
+
+  // --- 5. Setup SVG & chart area ---
+  const svg = d3.select("#chartContinent");
+  const width = 800, height = 500;
+  const margin = {top: 40, right: 100, bottom: 40, left: 60};
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain(d3.extent(years)).range([0, chartWidth]);
+  const y = d3.scaleLinear().range([chartHeight, 0]);
+  const color = d3.scaleOrdinal(d3.schemeTableau10).domain(continents);
+
+  const xAxis = g.append("g")
+    .attr("transform", `translate(0,${chartHeight})`)
+    .attr("class", "x-axis");
+  const yAxis = g.append("g")
+    .attr("class", "y-axis");
+
+  // Axis labels
+  g.append("text")
+    .attr("x", chartWidth / 2)
+    .attr("y", chartHeight + 35)
+    .attr("text-anchor", "middle")
+    .attr("class", "axis-label")
+    .text("Year");
+
+  g.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -chartHeight / 2)
+    .attr("y", -45)
+    .attr("text-anchor", "middle")
+    .attr("class", "axis-label")
+    .text("Gas emissions (Million metric tons of CO2 equivalent)");
+
+  const line = d3.line().x(d => x(d.Year)).y(d => y(d.Value));
+
+  // --- Tooltip ---
+  const tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip");
+
+  const focusCircle = g.append("circle")
+    .attr("r", 4)
+    .style("opacity", 0);
+
+  // --- Update function ---
+  function update(gasType) {
+    const filtered = flatData.filter(d => d.GasType === gasType);
+    y.domain([0, d3.max(filtered, d => d.Value)]).nice();
+
+    xAxis.call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    yAxis.call(d3.axisLeft(y));
+
+    const byCountry = d3.groups(filtered, d => d.Country);
+
+    const lines = g.selectAll(".line").data(byCountry, d => d[0]);
+    lines.enter()
+      .append("path")
+      .attr("class", "line")
+      .attr("fill", "none")
+      .attr("stroke-width", 2)
+      .merge(lines)
+      .attr("stroke", d => color(d[0]))
+      .transition()
+      .duration(750)
+      .attr("d", d => line(d[1]));
+    lines.exit().remove();
+
+    // Legend
+    g.selectAll(".legend-group").remove();
+    const legendGroup = g.append("g")
+      .attr("class", "legend-group")
+      .attr("transform", "translate(0, -20)");
+    const legend = legendGroup.selectAll(".legend")
+      .data(continents)
+      .join("g")
+      .attr("class", "legend")
+      .attr("transform", (d, i) => `translate(${i * 100}, 0)`);
+    legend.append("rect")
+      .attr("x", 0)
+      .attr("y", -10)
+      .attr("width", 14)
+      .attr("height", 14)
+      .attr("fill", d => color(d));
+    legend.append("text")
+      .attr("x", 20)
+      .attr("y", 2)
+      .text(d => d)
+      .style("font-size", "12px")
+      .style("alignment-baseline", "middle");
+
+    // Tooltip interaction
+    svg.on("mousemove", function(event) {
+      const [mx, my] = d3.pointer(event, svg.node());
+      const xYear = Math.round(x.invert(mx - margin.left));
+      if (xYear < years[0] || xYear > years[years.length - 1]) {
+        tooltip.style("opacity", 0);
+        focusCircle.style("opacity", 0);
+        return;
+      }
+
+      const valuesAtYear = byCountry.map(([country, vals]) => {
+        const v = vals.find(d => d.Year === xYear);
+        return v ? {country, ...v} : null;
+      }).filter(Boolean);
+
+      if (valuesAtYear.length) {
+        valuesAtYear.forEach(d => {
+          focusCircle
+            .attr("cx", x(d.Year))
+            .attr("cy", y(d.Value))
+            .attr("fill", color(d.country))
+            .style("opacity", 1);
+
+          tooltip
+            .style("opacity", 1)
+            .html(`<b>${d.country}</b><br>Year: ${d.Year}<br>Value: ${d3.format(",.2f")(d.Value)}`)
+            .style("left", (event.pageX + 12) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        });
+      }
+    });
+
+    svg.on("mouseleave", function() {
+      tooltip.style("opacity", 0);
+      focusCircle.style("opacity", 0);
+    });
+  }
+
+  // Initialize
+  const defaultGas = gasTypes[0];
+  update(defaultGas);
+  dropdown.on("change", e => update(e.target.value));
+
+});
+
+
+//third visualization
+// ============================
+// Streamgraph: Gas Emissions in Asian Subregions
+// ============================
+d3.csv("data/Indicator_1_1_annual_6562429754166382300.csv").then(data => {
+  const subregions = ['Central Asia', 'Eastern Asia', 'South-eastern Asia', 'Southern Asia', 'Western Asia'];
+  const years = d3.range(2010, 2024);
+
+  const longData = [];
+  data.forEach(d => {
+    if(subregions.includes(d.Country.trim())){
+      years.forEach(y => {
+        longData.push({
+          subregion: d.Country.trim(),
+          gas: d["Gas Type"].trim(),
+          year: +y,
+          value: +d[y]
+        });
+      });
+    }
+  });
+
+  // Dropdown for Gas Type
+  const gasTypes = Array.from(new Set(longData.map(d => d.gas)));
+  const dropdown = d3.select("#gasDropdownSubregion");
+  dropdown.selectAll("option")
+    .data(gasTypes)
+    .join("option")
+    .attr("value", d => d)
+    .text(d => d);
+
+  let selectedGas = gasTypes[0];
+  dropdown.on("change", function(){
+    selectedGas = this.value;
+    update(selectedGas);
+  });
+
+  // SVG setup
+  const svg = d3.select("#streamSubregion");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+  const margin = {top:40,right:150,bottom:40,left:60};
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleLinear().domain(d3.extent(years)).range([0, chartWidth]);
+  const y = d3.scaleLinear().range([chartHeight,0]);
+  const color = d3.scaleOrdinal(d3.schemeTableau10).domain(subregions);
+
+  const xAxis = g.append("g").attr("transform", `translate(0,${chartHeight})`);
+  const yAxis = g.append("g");
+
+  const tooltip = d3.select("#tooltip");
+
+  const area = d3.area()
+    .x(d => x(d.data.year))
+    .y0(d => y(d[0]))
+    .y1(d => y(d[1]))
+    .curve(d3.curveBasis);
+
+
+// Add vertical guide line *on top of layers*
+const guideLine = g.append("line")
+  .attr("stroke","#555")
+  .attr("stroke-width",1)
+  .attr("y1",0)
+  .attr("y2",chartHeight)
+  .style("opacity",0);
+
+// Layers group container (so we can control order)
+const layersGroup = g.append("g").attr("class","layers");
+
+// --- Update function ---
+function update(gas){
+    const gasData = longData.filter(d => d.gas === gas);
+    const pivotData = years.map(y => {
+      const row = {year: y};
+      subregions.forEach(s => {
+        const found = gasData.find(d => d.year===y && d.subregion===s);
+        row[s] = found ? found.value : 0;
+      });
+      return row;
+    });
+
+    const stack = d3.stack().keys(subregions)(pivotData);
+    y.domain([0, d3.max(stack[stack.length-1], d => d[1])]).nice();
+
+    xAxis.transition().duration(500).call(d3.axisBottom(x).tickFormat(d3.format("d")));
+    yAxis.transition().duration(500).call(d3.axisLeft(y));
+
+    const layers = layersGroup.selectAll(".layer").data(stack, d=>d.key);
+
+    layers.join(
+      enter => enter.append("path")
+                    .attr("class","layer")
+                    .attr("fill", d => {
+                        if(d.key==="Western Asia") return "#ff7f0e";       // highlight Western Asia
+                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c"; // highlight Southern Asia for Fluorinated
+                        return color(d.key);
+                    })
+                    .attr("opacity", d => {
+                        if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
+                        return 0.7;
+                    })
+                    .attr("d", area)
+                    .on("mousemove", (event,d)=>{
+                        const [mx] = d3.pointer(event);
+                        const yearVal = Math.round(x.invert(mx));
+                        const stackedPoint = pivotData.find(p=>p.year===yearVal) || pivotData[pivotData.length-1];
+                        const value = stackedPoint[d.key];
+
+                        // Tooltip content
+                        let html = `<b>${d.key}</b><br>Year: ${yearVal}<br>Value: ${d3.format(",.0f")(value)} MtCO₂e`;
+                        if(d.key==="Western Asia") html += "<br><b>Leader for all gases!</b>";
+                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) html += "<br><b>Leader for Fluorinated gases!</b>";
+
+                        tooltip.style("opacity",1)
+                          .style("left", (event.pageX+10)+"px")
+                          .style("top", (event.pageY-10)+"px")
+                          .html(html);
+
+                        guideLine
+                          .attr("x1", x(yearVal))
+                          .attr("x2", x(yearVal))
+                          .style("opacity",1);
+                    })
+                    .on("mouseleave", ()=>{
+                        tooltip.style("opacity",0);
+                        guideLine.style("opacity",0);
+                    }),
+      update => update.transition().duration(500)
+                      .attr("fill", d => {
+                        if(d.key==="Western Asia") return "#ff7f0e";
+                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
+                        return color(d.key);
+                      })
+                      .attr("opacity", d => {
+                        if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
+                        return 0.7;
+                      })
+                      .attr("d", area),
+      exit => exit.remove()
+    );
+
+    // Legend
+    g.selectAll(".legend-group").remove();
+    const legendGroup = g.append("g")
+      .attr("class","legend-group")
+      .attr("transform", `translate(${chartWidth + 20}, 0)`);
+
+    const legend = legendGroup.selectAll(".legend")
+      .data(subregions)
+      .join("g")
+      .attr("class","legend")
+      .attr("transform", (d,i)=>`translate(0, ${i*20})`);
+
+    legend.append("rect")
+      .attr("x",0).attr("y",0)
+      .attr("width",14).attr("height",14)
+      .attr("fill", d => {
+        if(d==="Western Asia") return "#ff7f0e";
+        if(d==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
+        return color(d);
+      });
+
+    legend.append("text")
+      .attr("x",20).attr("y",12)
+      .text(d=>d)
+      .style("font-size","12px");
+}
+
+
+  update(selectedGas);
+});

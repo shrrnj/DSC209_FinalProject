@@ -67,6 +67,33 @@
       <svg id="chartMain" viewBox="0 0 960 560" aria-label="Stacked horizontal bars"></svg>
       <p class="note">Hover for details. Values are the <b>sum</b> across selected years.</p>
     </section>
+
+    <section class="card">
+      <div class="header">
+        <h2>Global Gas Emissions by Continent: Asia Leads Across All Gas Types</h2>
+        <div>
+          <label for="gasDropdown">Gas Type:</label>
+          <select id="gasDropdown"></select>
+        </div>
+      </div>
+      <svg id="chartContinent" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet"></svg>
+      <p>From this analysis, we can see that Asia is the leader for gas omissions in all gas types - let us focus in on the Asia sub-regions.</p>
+    </section>
+
+    <section class="card">
+    <div class="header">
+    <h2 style="text-align:left;">Gas Emissions in Asian Subregions — Streamgraph</h2>
+    <label>Gas Type:
+      <select id="gasDropdownSubregion"></select>
+      </div>
+    </label>
+
+    <svg id="streamSubregion" width="800" height="500"></svg>
+    <div id="tooltip" class="tooltip" style="opacity:0"></div>
+    <p>From this analysis, we can see that Eastern Asia is the leader from Asia aside from Fluorinated gases where Southern Asia is the leader there. It can be interesting to look into factors that may lead to these trends. </p>
+    </section>
+
+
   </main>
 
   <div id="tooltip" class="tooltip" style="opacity:0"></div>
