@@ -177,3 +177,15 @@ h1 {
   color: #666;
   margin-top: 8px;
 }
+.radial-bar {
+  stroke: #fff;
+  stroke-width: 1px;
+}
+
+.radial-bar:hover {
+  opacity: 1;
+}
+
+.radial-label {
+  pointer-events: none;
+}

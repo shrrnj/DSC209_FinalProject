@@ -1,152 +1,155 @@
-// race.js — Bar chart race for world_ghg_by_industry.csv
+// race.js — Radial bar chart race of industry emissions
 (function () {
-  const margin = { top: 40, right: 140, bottom: 40, left: 240 };
-  const width = 900 - margin.left - margin.right;
-  const height = 500 - margin.top - margin.bottom;
+  const width = 600;
+  const height = 600;
+  const innerRadius = 80;
+  const outerRadius = Math.min(width, height) / 2 - 20;
 
-  const svg = d3
+  const svgRoot = d3
     .select("#chartRace")
-    .append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
+    .attr("width", width)
+    .attr("height", height);
 
-  const yearLabel = d3.select("#raceYearLabel");
+  // clear anything that might already be inside
+  svgRoot.selectAll("*").remove();
+
+  const g = svgRoot
+    .append("g")
+    .attr("transform", `translate(${width / 2},${height / 2})`);
+
+  const yearLabelOutside = d3.select("#raceYearLabel");
   const playButton = d3.select("#racePlay");
   const pauseButton = d3.select("#racePause");
 
-  let data;
+  const centerYear = g
+    .append("text")
+    .attr("text-anchor", "middle")
+    .attr("dy", "0.35em")
+    .attr("font-size", 28)
+    .attr("fill", "#333");
+
   let years;
+  let industries;
+  let dataByYear;
+  let maxEmission;
   let currentYearIndex = 0;
   let timer = null;
-  const frameDuration = 1200; // ms per year
+  const frameDuration = 1000; // ms per year
 
   d3.csv("data/world_ghg_by_industry.csv", d3.autoType).then(raw => {
-    data = raw.map(d => ({
+    const data = raw.map(d => ({
       Industry: d.Industry,
       Year: +d.Year,
       Emissions: +d.Emissions
     }));
 
     years = Array.from(new Set(data.map(d => d.Year))).sort((a, b) => a - b);
+    industries = Array.from(new Set(data.map(d => d.Industry))).sort();
 
-    const maxEmission = d3.max(data, d => d.Emissions);
+    // map: year -> array [{Industry, Year, Emissions}]
+    dataByYear = new Map();
+    years.forEach(year => {
+      const m = new Map(
+        data
+          .filter(d => d.Year === year)
+          .map(d => [d.Industry, d.Emissions])
+      );
 
-    const x = d3.scaleLinear().domain([0, maxEmission]).range([0, width]).nice();
-    const y = d3.scaleBand().range([0, height]).padding(0.2);
-    const color = d3.scaleOrdinal(d3.schemeTableau10);
+      const yearArray = industries.map(ind => ({
+        Industry: ind,
+        Year: year,
+        Emissions: m.get(ind) ?? 0
+      }));
 
-    const xAxis = d3.axisTop(x).ticks(6);
-    const xAxisGroup = svg.append("g").attr("class", "x-axis");
-    xAxisGroup.call(xAxis);
+      dataByYear.set(year, yearArray);
+    });
 
-    svg
+    maxEmission = d3.max(data, d => d.Emissions);
+
+    const angle = d3
+      .scaleBand()
+      .domain(industries)
+      .range([0, 2 * Math.PI])
+      .align(0);
+
+    const radius = d3
+      .scaleLinear()
+      .domain([0, maxEmission])
+      .range([innerRadius, outerRadius]);
+
+    const color = d3
+      .scaleOrdinal()
+      .domain(industries)
+      .range(d3.schemeTableau10);
+
+    const arc = d3
+      .arc()
+      .innerRadius(innerRadius)
+      .outerRadius(d => radius(d.Emissions))
+      .startAngle(d => angle(d.Industry))
+      .endAngle(d => angle(d.Industry) + angle.bandwidth())
+      .padAngle(0.02)
+      .padRadius(innerRadius);
+
+    // circular grid rings for context
+    const gridValues = [0.25, 0.5, 0.75, 1].map(f => f * maxEmission);
+    g.selectAll(".grid-circle")
+      .data(gridValues)
+      .enter()
+      .append("circle")
+      .attr("class", "grid-circle")
+      .attr("r", d => radius(d))
+      .attr("fill", "none")
+      .attr("stroke", "#ddd")
+      .attr("stroke-width", 1);
+
+    // radial bars
+    const bars = g
+      .selectAll(".radial-bar")
+      .data(dataByYear.get(years[0]), d => d.Industry)
+      .enter()
+      .append("path")
+      .attr("class", "radial-bar")
+      .attr("fill", d => color(d.Industry))
+      .attr("opacity", 0.85)
+      .attr("d", arc);
+
+    // labels around outer edge (industry names)
+    const labels = g
+      .selectAll(".radial-label")
+      .data(industries)
+      .enter()
       .append("text")
-      .attr("x", width)
-      .attr("y", -20)
-      .attr("text-anchor", "end")
-      .attr("fill", "#555")
-      .text("Million metric tons CO₂ equivalent");
+      .attr("class", "radial-label")
+      .attr("text-anchor", "middle")
+      .attr("font-size", 10)
+      .attr("fill", "#333")
+      .attr("transform", d => {
+        const a = angle(d) + angle.bandwidth() / 2 - Math.PI / 2;
+        const r = outerRadius + 16;
+        return `translate(${Math.cos(a) * r},${Math.sin(a) * r}) rotate(${
+          (a * 180) / Math.PI
+        })`;
+      })
+      .text(d => d);
 
-    function getYearData(year) {
-      const filtered = data
-        .filter(d => d.Year === year)
-        .sort((a, b) => d3.descending(a.Emissions, b.Emissions));
+    function updateYear(year, animate = true) {
+      const yearData = dataByYear.get(year);
+      yearLabelOutside.text(year);
+      centerYear.text(year);
 
-      y.domain(filtered.map(d => d.Industry));
-      return filtered;
-    }
+      const t = animate
+        ? g.transition().duration(frameDuration * 0.9).ease(d3.easeCubicInOut)
+        : g;
 
-    function drawYear(year, firstTime = false) {
-      const yearData = getYearData(year);
-      yearLabel.text(year);
-
-      const t = svg
-        .transition()
-        .duration(firstTime ? 0 : frameDuration)
-        .ease(d3.easeCubicInOut);
-
-      const bars = svg.selectAll("rect.bar").data(yearData, d => d.Industry);
-      const labels = svg.selectAll("text.label").data(yearData, d => d.Industry);
-      const values = svg.selectAll("text.value").data(yearData, d => d.Industry);
-
-      // ENTER bars
       bars
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", 0)
-        .attr("y", d => y(d.Industry))
-        .attr("height", y.bandwidth())
-        .attr("width", d => x(d.Emissions))
-        .attr("fill", d => color(d.Industry))
-        .append("title")
-        .text(d => `${d.Industry}\n${d.Emissions.toFixed(1)} MtCO₂e`);
-
-      // UPDATE bars
-      bars
+        .data(yearData, d => d.Industry)
         .transition(t)
-        .attr("y", d => y(d.Industry))
-        .attr("height", y.bandwidth())
-        .attr("width", d => x(d.Emissions))
-        .selection()
-        .select("title")
-        .text(d => `${d.Industry}\n${d.Emissions.toFixed(1)} MtCO₂e`);
-
-      // EXIT bars
-      bars
-        .exit()
-        .transition(t)
-        .attr("width", 0)
-        .remove();
-
-      // ENTER labels
-      labels
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", -10)
-        .attr("y", d => y(d.Industry) + y.bandwidth() / 2)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "end")
-        .text(d => d.Industry)
-        .style("font-size", "11px")
-        .style("fill", "#333");
-
-      // UPDATE labels
-      labels
-        .transition(t)
-        .attr("y", d => y(d.Industry) + y.bandwidth() / 2);
-
-      // EXIT labels
-      labels.exit().remove();
-
-      // ENTER value labels
-      values
-        .enter()
-        .append("text")
-        .attr("class", "value")
-        .attr("x", d => x(d.Emissions) + 5)
-        .attr("y", d => y(d.Industry) + y.bandwidth() / 2)
-        .attr("dy", "0.35em")
-        .attr("text-anchor", "start")
-        .text(d => d.Emissions.toFixed(0))
-        .style("font-size", "11px")
-        .style("fill", "#333");
-
-      // UPDATE value labels
-      values
-        .transition(t)
-        .attr("x", d => x(d.Emissions) + 5)
-        .attr("y", d => y(d.Industry) + y.bandwidth() / 2)
-        .text(d => d.Emissions.toFixed(0));
-
-      // EXIT value labels
-      values.exit().remove();
-
-      xAxisGroup.call(xAxis);
+        .attr("d", arc);
     }
 
     function step() {
-      drawYear(years[currentYearIndex]);
+      updateYear(years[currentYearIndex]);
       currentYearIndex++;
       if (currentYearIndex >= years.length) {
         clearInterval(timer);
@@ -169,7 +172,8 @@
       }
     });
 
-    // first frame
-    drawYear(years[0], true);
+    // initial frame
+    updateYear(years[0], false);
   });
 })();
+
