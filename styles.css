@@ -189,3 +189,33 @@ h1 {
 .radial-label {
   pointer-events: none;
 }
+
+
+/* ---- Heatmap styles ---- */
+.heat-cell {
+  stroke: #f8fafc;
+  stroke-width: 0.5px;
+}
+
+.heatmap-legend text {
+  fill: var(--muted);
+}
+
+/* ---- Lorenz curve styles ---- */
+.lorenz-eq {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 3;
+}
+
+.lorenz-curve {
+  fill: none;
+  stroke: #2563eb; 
+  stroke-width: 2.5px;
+}
+
+.lorenz-shade {
+  fill: rgba(37, 99, 235, 0.15);
+  stroke: none;
+}

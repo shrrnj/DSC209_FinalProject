@@ -110,6 +110,27 @@
       </p>
     </section>
 
+    <!-- chart 5: Industry × Continent heatmap -->
+    <section class="card">
+      <h2>Emissions Hotspots · Industries × Continents (Greenhouse Gas, 2023)</h2>
+      <svg id="heatmapIndustries" viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        Each cell shows total greenhouse gas emissions (MtCO₂e) for an industry–continent pair in 2023.
+        Darker squares indicate sectors that dominate a region’s footprint.
+      </p>
+    </section>
+
+    <!-- chart 6: Lorenz curve -->
+    <section class="card">
+      <h2>Carbon Inequality · Lorenz Curve by Region (Greenhouse Gas, 2023)</h2>
+      <svg id="lorenzCurve" viewBox="0 0 520 420" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        Regions are sorted from lowest to highest emissions. If every region emitted equally,
+        the curve would follow the diagonal line. The farther the blue curve bows below that line,
+        the more unequal emissions are across regions.
+      </p>
+    </section>
+  
   </main>
 
   <div id="tooltip" class="tooltip" style="opacity:0"></div>
@@ -117,5 +138,6 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script defer src="./app.js?v=5"></script>
   <script defer src="./race.js"></script>
+  <script defer src="./static_charts.js"></script>
 </body>
 </html>
