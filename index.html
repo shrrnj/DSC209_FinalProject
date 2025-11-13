@@ -93,6 +93,22 @@
     <p>From this analysis, we can see that Eastern Asia is the leader from Asia aside from Fluorinated gases where Southern Asia is the leader there. It can be interesting to look into factors that may lead to these trends. </p>
     </section>
 
+    <section class="card">
+      <div class="header">
+        <h2>Industry Greenhouse Gas Emissions — Bar Chart Race (2010–2023)</h2>
+      </div>
+
+      <div id="raceControls" class="controls">
+        <button id="racePlay">Play</button>
+        <button id="racePause">Pause</button>
+        <span id="raceYearLabel"></span>
+      </div>
+
+      <svg id="chartRace" viewBox="0 0 960 560" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        Animated bar chart race showing total greenhouse gas emissions by major industries from 2010–2023. The chart highlights which sectors consistently contribute the most to global greenhouse gas output and reveals how their emissions have changed over time. This provides a comparative view of global industry trends and helps identify the sectors with the largest environmental impact.
+      </p>
+    </section>
 
   </main>
 
@@ -100,5 +116,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script defer src="./app.js?v=5"></script>
+  <script defer src="./race.js"></script>
 </body>
 </html>
