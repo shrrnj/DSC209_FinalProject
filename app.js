@@ -378,7 +378,6 @@ d3.csv("data/Indicator_1_1_annual_6562429754166382300.csv").then(function(data) 
 });
 
 
-//third visualization
 // ============================
 // Streamgraph: Gas Emissions in Asian Subregions
 // ============================
@@ -440,116 +439,115 @@ d3.csv("data/Indicator_1_1_annual_6562429754166382300.csv").then(data => {
     .curve(d3.curveBasis);
 
 
-// Add vertical guide line *on top of layers*
-const guideLine = g.append("line")
-  .attr("stroke","#555")
-  .attr("stroke-width",1)
-  .attr("y1",0)
-  .attr("y2",chartHeight)
-  .style("opacity",0);
+  // Add vertical guide line *on top of layers*
+  const guideLine = g.append("line")
+    .attr("stroke","#555")
+    .attr("stroke-width",1)
+    .attr("y1",0)
+    .attr("y2",chartHeight)
+    .style("opacity",0);
 
-// Layers group container (so we can control order)
-const layersGroup = g.append("g").attr("class","layers");
+  // Layers group container (so we can control order)
+  const layersGroup = g.append("g").attr("class","layers");
 
-// --- Update function ---
-function update(gas){
-    const gasData = longData.filter(d => d.gas === gas);
-    const pivotData = years.map(y => {
-      const row = {year: y};
-      subregions.forEach(s => {
-        const found = gasData.find(d => d.year===y && d.subregion===s);
-        row[s] = found ? found.value : 0;
+  // --- Update function ---
+  function update(gas){
+      const gasData = longData.filter(d => d.gas === gas);
+      const pivotData = years.map(y => {
+        const row = {year: y};
+        subregions.forEach(s => {
+          const found = gasData.find(d => d.year===y && d.subregion===s);
+          row[s] = found ? found.value : 0;
+        });
+        return row;
       });
-      return row;
-    });
 
-    const stack = d3.stack().keys(subregions)(pivotData);
-    y.domain([0, d3.max(stack[stack.length-1], d => d[1])]).nice();
+      const stack = d3.stack().keys(subregions)(pivotData);
+      y.domain([0, d3.max(stack[stack.length-1], d => d[1])]).nice();
 
-    xAxis.transition().duration(500).call(d3.axisBottom(x).tickFormat(d3.format("d")));
-    yAxis.transition().duration(500).call(d3.axisLeft(y));
+      xAxis.transition().duration(500).call(d3.axisBottom(x).tickFormat(d3.format("d")));
+      yAxis.transition().duration(500).call(d3.axisLeft(y));
 
-    const layers = layersGroup.selectAll(".layer").data(stack, d=>d.key);
+      const layers = layersGroup.selectAll(".layer").data(stack, d=>d.key);
 
-    layers.join(
-      enter => enter.append("path")
-                    .attr("class","layer")
-                    .attr("fill", d => {
-                        if(d.key==="Western Asia") return "#ff7f0e";       // highlight Western Asia
-                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c"; // highlight Southern Asia for Fluorinated
-                        return color(d.key);
-                    })
-                    .attr("opacity", d => {
-                        if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
-                        return 0.7;
-                    })
-                    .attr("d", area)
-                    .on("mousemove", (event,d)=>{
-                        const [mx] = d3.pointer(event);
-                        const yearVal = Math.round(x.invert(mx));
-                        const stackedPoint = pivotData.find(p=>p.year===yearVal) || pivotData[pivotData.length-1];
-                        const value = stackedPoint[d.key];
-
-                        // Tooltip content
-                        let html = `<b>${d.key}</b><br>Year: ${yearVal}<br>Value: ${d3.format(",.0f")(value)} MtCO₂e`;
-                        if(d.key==="Western Asia") html += "<br><b>Leader for all gases!</b>";
-                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) html += "<br><b>Leader for Fluorinated gases!</b>";
-
-                        tooltip.style("opacity",1)
-                          .style("left", (event.pageX+10)+"px")
-                          .style("top", (event.pageY-10)+"px")
-                          .html(html);
-
-                        guideLine
-                          .attr("x1", x(yearVal))
-                          .attr("x2", x(yearVal))
-                          .style("opacity",1);
-                    })
-                    .on("mouseleave", ()=>{
-                        tooltip.style("opacity",0);
-                        guideLine.style("opacity",0);
-                    }),
-      update => update.transition().duration(500)
+      layers.join(
+        enter => enter.append("path")
+                      .attr("class","layer")
                       .attr("fill", d => {
-                        if(d.key==="Western Asia") return "#ff7f0e";
-                        if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
-                        return color(d.key);
+                          if(d.key==="Western Asia") return "#ff7f0e";       // highlight Western Asia
+                          if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c"; // highlight Southern Asia for Fluorinated
+                          return color(d.key);
                       })
                       .attr("opacity", d => {
-                        if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
-                        return 0.7;
+                          if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
+                          return 0.7;
                       })
-                      .attr("d", area),
-      exit => exit.remove()
-    );
+                      .attr("d", area)
+                      .on("mousemove", (event,d)=>{
+                          const [mx] = d3.pointer(event);
+                          const yearVal = Math.round(x.invert(mx));
+                          const stackedPoint = pivotData.find(p=>p.year===yearVal) || pivotData[pivotData.length-1];
+                          const value = stackedPoint[d.key];
 
-    // Legend
-    g.selectAll(".legend-group").remove();
-    const legendGroup = g.append("g")
-      .attr("class","legend-group")
-      .attr("transform", `translate(${chartWidth + 20}, 0)`);
+                          // Tooltip content
+                          let html = `<b>${d.key}</b><br>Year: ${yearVal}<br>Value: ${d3.format(",.0f")(value)} MtCO₂e`;
+                          if(d.key==="Western Asia") html += "<br><b>Leader for all gases!</b>";
+                          if(d.key==="Southern Asia" && gas.includes("Fluorinated")) html += "<br><b>Leader for Fluorinated gases!</b>";
 
-    const legend = legendGroup.selectAll(".legend")
-      .data(subregions)
-      .join("g")
-      .attr("class","legend")
-      .attr("transform", (d,i)=>`translate(0, ${i*20})`);
+                          tooltip.style("opacity",1)
+                            .style("left", (event.pageX+10)+"px")
+                            .style("top", (event.pageY-10)+"px")
+                            .html(html);
 
-    legend.append("rect")
-      .attr("x",0).attr("y",0)
-      .attr("width",14).attr("height",14)
-      .attr("fill", d => {
-        if(d==="Western Asia") return "#ff7f0e";
-        if(d==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
-        return color(d);
-      });
+                          guideLine
+                            .attr("x1", x(yearVal))
+                            .attr("x2", x(yearVal))
+                            .style("opacity",1);
+                      })
+                      .on("mouseleave", ()=>{
+                          tooltip.style("opacity",0);
+                          guideLine.style("opacity",0);
+                      }),
+        update => update.transition().duration(500)
+                        .attr("fill", d => {
+                          if(d.key==="Western Asia") return "#ff7f0e";
+                          if(d.key==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
+                          return color(d.key);
+                        })
+                        .attr("opacity", d => {
+                          if(d.key==="Western Asia" || (d.key==="Southern Asia" && gas.includes("Fluorinated"))) return 0.9;
+                          return 0.7;
+                        })
+                        .attr("d", area),
+        exit => exit.remove()
+      );
 
-    legend.append("text")
-      .attr("x",20).attr("y",12)
-      .text(d=>d)
-      .style("font-size","12px");
-}
+      // Legend
+      g.selectAll(".legend-group").remove();
+      const legendGroup = g.append("g")
+        .attr("class","legend-group")
+        .attr("transform", `translate(${chartWidth + 20}, 0)`);
 
+      const legend = legendGroup.selectAll(".legend")
+        .data(subregions)
+        .join("g")
+        .attr("class","legend")
+        .attr("transform", (d,i)=>`translate(0, ${i*20})`);
+
+      legend.append("rect")
+        .attr("x",0).attr("y",0)
+        .attr("width",14).attr("height",14)
+        .attr("fill", d => {
+          if(d==="Western Asia") return "#ff7f0e";
+          if(d==="Southern Asia" && gas.includes("Fluorinated")) return "#2ca02c";
+          return color(d);
+        });
+
+      legend.append("text")
+        .attr("x",20).attr("y",12)
+        .text(d=>d)
+        .style("font-size","12px");
+  }
 
   update(selectedGas);
 });
