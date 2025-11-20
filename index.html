@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>GHG · Snapshot — Multi-Year Chips</title>
+  <title>GHG · Asia-Focused Story</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" href="./styles.css?v=5" />
@@ -10,64 +10,14 @@
 <body>
   <main class="wrap">
     <header class="top">
-      <h1>GHG · Snapshot — Region × (Industry | Gas)</h1>
+      <h1>Greenhouse Gas Emissions · From Global View to Asian Subregions</h1>
       <p class="sub">
-        Pick a region, choose <b>Industries</b> or <b>Gases</b>, then select one or more <b>years</b> below.
-        Stacks show the opposite dimension. Values are summed over selected years.
+        We start with a global view of gas emissions by continent, then zoom into Asian subregions and industries
+        to see which areas and sectors drive the largest footprints.
       </p>
     </header>
 
-    <section class="controls">
-      <label>Region
-        <select id="regionSel">
-          <option>Advanced Economies</option>
-          <option>Africa</option>
-          <option>Americas</option>
-          <option>Asia</option>
-          <option>Australia and New Zealand</option>
-          <option>Central Asia</option>
-          <option>Eastern Asia</option>
-          <option>Eastern Europe</option>
-          <option>Emerging and Developing Economies</option>
-          <option>Europe</option>
-          <option>G20</option>
-          <option>G7</option>
-          <option>Latin America and the Caribbean</option>
-          <option>Northern Africa</option>
-          <option>Northern America</option>
-          <option>Northern Europe</option>
-          <option>Oceania</option>
-          <option>Other Oceania sub-regions</option>
-          <option>South-eastern Asia</option>
-          <option>Southern Asia</option>
-          <option>Southern Europe</option>
-          <option>Sub-Saharan Africa</option>
-          <option>Western Asia</option>
-          <option>Western Europe</option>
-          <option selected>World</option>
-        </select>
-      </label>
-
-      <label>Compare by
-        <select id="modeSel">
-          <option value="industry">Industry</option>
-          <option value="gas">Gas</option>
-        </select>
-      </label>
-    </section>
-
-    <section>
-      <div class="chipbar" id="yearChips" aria-label="Select one or more years"></div>
-      <p class="chipnote" id="yearsSummary"></p>
-    </section>
-
-    <section class="card">
-      <h2 id="snapTitle">Snapshot</h2>
-      <div id="legendMain" class="legend"></div>
-      <svg id="chartMain" viewBox="0 0 960 560" aria-label="Stacked horizontal bars"></svg>
-      <p class="note">Hover for details. Values are the <b>sum</b> across selected years.</p>
-    </section>
-
+    <!-- 1. Global continents line chart -->
     <section class="card">
       <div class="header">
         <h2>Global Gas Emissions by Continent: Asia Leads Across All Gas Types</h2>
@@ -76,24 +26,30 @@
           <select id="gasDropdown"></select>
         </div>
       </div>
-      <svg id="chartContinent" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet"></svg>
-      <p>From this analysis, we can see that Asia is the leader for gas omissions in all gas types - let us focus in on the Asia sub-regions.</p>
+      <svg id="chartContinent" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        This chart shows total annual greenhouse gas emissions by continent. Asia stands out as the largest emitter
+        across gas types, motivating a closer look at how emissions are distributed within Asia.
+      </p>
     </section>
 
+    <!-- 2. Asian subregions streamgraph -->
     <section class="card">
       <div class="header">
-        <h2 style="text-align:left;">Gas Emissions in Asian Subregions — Streamgraph</h2>
+        <h2>Gas Emissions in Asian Subregions — Streamgraph</h2>
         <label>Gas Type:
           <select id="gasDropdownSubregion"></select>
         </label>
       </div>
-
-      <svg id="streamSubregion" width="800" height="500"></svg>
-      <div id="tooltip" class="tooltip" style="opacity:0"></div>
-      <p>From this analysis, we can see that Eastern Asia is the leader from Asia aside from Fluorinated gases where Southern Asia is the leader there. It can be interesting to look into factors that may lead to these trends. </p>
+      <svg id="streamSubregion" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        The streamgraph shows how total emissions are distributed across Asian subregions over time.
+        Eastern Asia dominates most gas types, while Southern Asia is more prominent for certain gases
+        such as fluorinated gases.
+      </p>
     </section>
 
-    <!-- Radial stacked bars -->
+    <!-- 3. Radial stacked bars for Asian subregions × industries -->
     <section class="card">
       <div class="header">
         <h2>Asian Subregions · Industry Composition (Radial Stacked Bars)</h2>
@@ -112,7 +68,7 @@
       </p>
     </section>
 
-    <!-- NEW: Stacked bar chart -->
+    <!-- 4. Horizontal stacked bars for Asian subregions × industries -->
     <section class="card">
       <div class="header">
         <h2>Asian Subregions · Industry Composition (Stacked Bars)</h2>
@@ -123,9 +79,7 @@
       </div>
 
       <div id="asiaBarLegend" class="legend"></div>
-
       <svg id="asiaBarChart" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
-
       <p class="note">
         Each bar represents an Asian subregion. Bar length shows total greenhouse gas emissions for that year,
         while colors show how much each industry contributes within the subregion. Use Play to step through years
@@ -133,53 +87,30 @@
       </p>
     </section>
 
+    <!-- 5. Heatmap: industry × Asian subregions -->
     <section class="card">
       <div class="header">
-        <h2>Industry Greenhouse Gas Emissions — Bar Chart Race (2010–2023)</h2>
+        <h2>Emissions Hotspots · Industries × Asian Subregions (Greenhouse Gas)</h2>
+        <div>
+          <label for="heatmapYear">Year:</label>
+          <select id="heatmapYear"></select>
+        </div>
       </div>
-
-      <div id="raceControls" class="controls">
-        <button id="racePlay">Play</button>
-        <button id="racePause">Pause</button>
-        <span id="raceYearLabel"></span>
-      </div>
-
-      <svg id="chartRace" viewBox="0 0 960 560" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="heatmapIndustries" viewBox="0 0 960 420" preserveAspectRatio="xMidYMid meet"></svg>
       <p class="note">
-        Animated chart race showing total greenhouse gas emissions by major industries from 2010–2023. The chart highlights which sectors consistently contribute the most to global greenhouse gas output and reveals how their emissions have changed over time. This provides a comparative view of global industry trends and helps identify the sectors with the largest environmental impact.
+        Each cell shows total greenhouse gas emissions (MtCO₂e) for an industry–Asian subregion pair.
+        Darker squares indicate sectors that dominate that subregion’s footprint in the selected year.
       </p>
     </section>
 
-    <!-- Heatmap -->
-    <section class="card">
-      <h2>Emissions Hotspots · Industries × Asian Subregions (Greenhouse Gas, 2023)</h2>
-      <svg id="heatmapIndustries" viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet"></svg>
-      <p class="note">
-        Each cell shows total greenhouse gas emissions (MtCO₂e) for an industry–Asian subregion pair in 2023.
-        Darker squares indicate sectors that dominate that subregion’s footprint.
-      </p>
-    </section>
-
-    <!-- Lorenz curve -->
-    <section class="card">
-      <h2>Carbon Inequality · Lorenz Curve by Region (Greenhouse Gas, 2023)</h2>
-      <svg id="lorenzCurve" viewBox="0 0 520 420" preserveAspectRatio="xMidYMid meet"></svg>
-      <p class="note">
-        Regions are sorted from lowest to highest emissions. If every region emitted equally,
-        the curve would follow the diagonal line. The farther the blue curve bows below that line,
-        the more unequal emissions are across regions.
-      </p>
-    </section>
-  
   </main>
 
   <div id="tooltip" class="tooltip" style="opacity:0"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script defer src="./app.js?v=5"></script>
-  <script defer src="./race.js"></script>
-  <script defer src="./static_charts.js"></script>
+  <script defer src="./app.js"></script>
   <script defer src="./radial_asia.js"></script>
   <script defer src="./asia_bar.js"></script>
+  <script defer src="./heatmap.js"></script>
 </body>
 </html>
