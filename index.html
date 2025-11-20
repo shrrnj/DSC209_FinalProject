@@ -81,16 +81,56 @@
     </section>
 
     <section class="card">
-    <div class="header">
-    <h2 style="text-align:left;">Gas Emissions in Asian Subregions — Streamgraph</h2>
-    <label>Gas Type:
-      <select id="gasDropdownSubregion"></select>
+      <div class="header">
+        <h2 style="text-align:left;">Gas Emissions in Asian Subregions — Streamgraph</h2>
+        <label>Gas Type:
+          <select id="gasDropdownSubregion"></select>
+        </label>
       </div>
-    </label>
 
-    <svg id="streamSubregion" width="800" height="500"></svg>
-    <div id="tooltip" class="tooltip" style="opacity:0"></div>
-    <p>From this analysis, we can see that Eastern Asia is the leader from Asia aside from Fluorinated gases where Southern Asia is the leader there. It can be interesting to look into factors that may lead to these trends. </p>
+      <svg id="streamSubregion" width="800" height="500"></svg>
+      <div id="tooltip" class="tooltip" style="opacity:0"></div>
+      <p>From this analysis, we can see that Eastern Asia is the leader from Asia aside from Fluorinated gases where Southern Asia is the leader there. It can be interesting to look into factors that may lead to these trends. </p>
+    </section>
+
+    <!-- Radial stacked bars -->
+    <section class="card">
+      <div class="header">
+        <h2>Asian Subregions · Industry Composition (Radial Stacked Bars)</h2>
+        <div id="radialControls" class="mini-controls">
+          <button id="radialPlay">Play</button>
+          <button id="radialPause">Pause</button>
+        </div>
+      </div>
+
+      <div id="radialLegend" class="legend"></div>
+      <svg id="chartRadialAsia" viewBox="0 0 720 720" preserveAspectRatio="xMidYMid meet"></svg>
+      <p class="note">
+        Each arc represents an Asian subregion. The radius encodes total greenhouse gas emissions for that year,
+        while colors show how much each industry contributes within that subregion.
+        Use Play to step through years automatically and compare how different subregions grow over time.
+      </p>
+    </section>
+
+    <!-- NEW: Stacked bar chart -->
+    <section class="card">
+      <div class="header">
+        <h2>Asian Subregions · Industry Composition (Stacked Bars)</h2>
+        <div id="asiaBarControls" class="mini-controls">
+          <button id="asiaBarPlay">Play</button>
+          <button id="asiaBarPause">Pause</button>
+        </div>
+      </div>
+
+      <div id="asiaBarLegend" class="legend"></div>
+
+      <svg id="asiaBarChart" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <p class="note">
+        Each bar represents an Asian subregion. Bar length shows total greenhouse gas emissions for that year,
+        while colors show how much each industry contributes within the subregion. Use Play to step through years
+        automatically and compare how the composition and scale change across time.
+      </p>
     </section>
 
     <section class="card">
@@ -110,7 +150,7 @@
       </p>
     </section>
 
-    <!-- chart 5: Industry × Asian subregion heatmap -->
+    <!-- Heatmap -->
     <section class="card">
       <h2>Emissions Hotspots · Industries × Asian Subregions (Greenhouse Gas, 2023)</h2>
       <svg id="heatmapIndustries" viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet"></svg>
@@ -120,7 +160,7 @@
       </p>
     </section>
 
-    <!-- chart 6: Lorenz curve -->
+    <!-- Lorenz curve -->
     <section class="card">
       <h2>Carbon Inequality · Lorenz Curve by Region (Greenhouse Gas, 2023)</h2>
       <svg id="lorenzCurve" viewBox="0 0 520 420" preserveAspectRatio="xMidYMid meet"></svg>
@@ -139,5 +179,7 @@
   <script defer src="./app.js?v=5"></script>
   <script defer src="./race.js"></script>
   <script defer src="./static_charts.js"></script>
+  <script defer src="./radial_asia.js"></script>
+  <script defer src="./asia_bar.js"></script>
 </body>
 </html>
