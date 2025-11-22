@@ -9,15 +9,25 @@
 </head>
 <body>
   <main class="wrap">
+
+    <!-- TITLE + INTRO -->
     <header class="top">
       <h1>Greenhouse Gas Emissions · From Global View to Asian Subregions</h1>
       <p class="sub">
-        We start with a global view of gas emissions by continent, then zoom into Asian subregions and industries
-        to see which areas and sectors drive the largest footprints.
+        When exploring the data on how industries and regions contribute to global greenhouse gas (GHG)
+        emissions from 2010 to 2023, one pattern stood out to us immediately: Asia leads all continents
+        across every major gas type.
+      </p>
+      <p class="sub">
+        This was a consistent trend that appeared across our dataset, so we decided to dig deeper and use
+        two external sources for context. The two articles we found — the United Nations Economic and Social
+        Commission for Asia and the Pacific’s 2024 climate review and the “Emerging Carbon Dioxide Hotspots
+        in East Asia” Nature article — helped us better understand why Asia shows such high emission levels
+        and how our visual findings match broader research.
       </p>
     </header>
 
-    <!-- 1. Global continents line chart -->
+    <!-- 1. GLOBAL GAS EMISSIONS BY CONTINENT -->
     <section class="card">
       <div class="header">
         <h2>Global Gas Emissions by Continent: Asia Leads Across All Gas Types</h2>
@@ -26,49 +36,27 @@
           <select id="gasDropdown"></select>
         </div>
       </div>
+
+      <!-- 1st GRAPH -->
       <svg id="chartContinent" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <!-- 1st PARAGRAPH EXPLANATION -->
       <p class="note">
-        This chart shows total annual greenhouse gas emissions by continent. Asia stands out as the largest emitter
-        across gas types, motivating a closer look at how emissions are distributed within Asia.
+        Our first graph gives a global snapshot of how emissions differ across continents.
+        The format highlights how Asia’s proportional difference across regions is not just limited to
+        carbon dioxide (CO₂); it also extends across methane, nitrous oxide, and fluorinated gases.
+        This aligns with the UN ESCAP 2024 review, which estimates that Asia/Pacific alone accounts for
+        nearly 60% of global emissions in recent years. The article attributes this to rapid
+        industrialization, large population growth, and heavy reliance on energy-intensive sectors.
+      </p>
+      <p class="note">
+        <em>Graph interactive cue:</em>
+        Hover over each continent to compare how the distribution of gas types shifts globally and
+        see which gases contributed the most to Asia’s lead.
       </p>
     </section>
 
-    <!-- 2. Asian subregions streamgraph -->
-    <section class="card">
-      <div class="header">
-        <h2>Gas Emissions in Asian Subregions — Streamgraph</h2>
-        <label>Gas Type:
-          <select id="gasDropdownSubregion"></select>
-        </label>
-      </div>
-      <svg id="streamSubregion" viewBox="0 0 960 500" preserveAspectRatio="xMidYMid meet"></svg>
-      <p class="note">
-        The streamgraph shows how total emissions are distributed across Asian subregions over time.
-        Eastern Asia dominates most gas types, while Southern Asia is more prominent for certain gases
-        such as fluorinated gases.
-      </p>
-    </section>
-
-    <!-- 3. Radial stacked bars for Asian subregions × industries -->
-    <section class="card">
-      <div class="header">
-        <h2>Asian Subregions · Industry Composition (Radial Stacked Bars)</h2>
-        <div id="radialControls" class="mini-controls">
-          <button id="radialPlay">Play</button>
-          <button id="radialPause">Pause</button>
-        </div>
-      </div>
-
-      <div id="radialLegend" class="legend"></div>
-      <svg id="chartRadialAsia" viewBox="0 0 720 720" preserveAspectRatio="xMidYMid meet"></svg>
-      <p class="note">
-        Each arc represents an Asian subregion. The radius encodes total greenhouse gas emissions for that year,
-        while colors show how much each industry contributes within that subregion.
-        Use Play to step through years automatically and compare how different subregions grow over time.
-      </p>
-    </section>
-
-    <!-- 4. Horizontal stacked bars for Asian subregions × industries -->
+    <!-- 2. ASIAN SUBREGIONS · INDUSTRY COMPOSITION (STACKED BARS) -->
     <section class="card">
       <div class="header">
         <h2>Asian Subregions · Industry Composition (Stacked Bars)</h2>
@@ -78,16 +66,31 @@
         </div>
       </div>
 
+      <!-- 2nd GRAPH -->
       <div id="asiaBarLegend" class="legend"></div>
       <svg id="asiaBarChart" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <!-- 2nd PARAGRAPH EXPLANATION -->
       <p class="note">
-        Each bar represents an Asian subregion. Bar length shows total greenhouse gas emissions for that year,
-        while colors show how much each industry contributes within the subregion. Use Play to step through years
-        automatically and compare how the composition and scale change across time.
+        Once we noticed Asia’s global lead, we zoomed in using a stacked bar chart to break emissions
+        down by Asian subregions. This layered breakdown makes it easier to compare industries like
+        electricity and heat generation, manufacturing, agriculture, transportation, and construction
+        across Eastern, Southern, Western, and Southeastern Asia.
+      </p>
+      <p class="note">
+        The graph shows that Eastern Asia has a very large emission contribution from electricity and
+        manufacturing, while other regions show more influence from agriculture or transportation.
+        In the Nature study on East Asian carbon hotspots, the authors show that China (in Eastern Asia)
+        produces the majority of industrial and energy-related emissions, which matches what we see
+        in our visualization.
+      </p>
+      <p class="note">
+        <em>Graph interactive cue:</em>
+        Hover over Southern or Western Asia to see how industrial activity differs from Eastern Asia.
       </p>
     </section>
 
-    <!-- 5. Heatmap: industry × Asian subregions -->
+    <!-- 3. EMISSIONS HOTSPOTS · INDUSTRIES × ASIAN SUBREGIONS (HEATMAP) -->
     <section class="card">
       <div class="header">
         <h2>Emissions Hotspots · Industries × Asian Subregions (Greenhouse Gas)</h2>
@@ -96,10 +99,59 @@
           <select id="heatmapYear"></select>
         </div>
       </div>
+
+      <!-- 3rd GRAPH -->
       <svg id="heatmapIndustries" viewBox="0 0 960 420" preserveAspectRatio="xMidYMid meet"></svg>
+
+      <!-- 3rd PARAGRAPH EXPLANATION -->
       <p class="note">
-        Each cell shows total greenhouse gas emissions (MtCO₂e) for an industry–Asian subregion pair.
-        Darker squares indicate sectors that dominate that subregion’s footprint in the selected year.
+        The third visualization brings everything together by highlighting where the most intense
+        emission hotspots occur, displaying both industry and subregions simultaneously. The heatmap
+        makes it easy to identify these “hotspots” because the highest-emitting combinations visually
+        stand out through darker colors.
+      </p>
+      <p class="note">
+        As we suspected, Eastern Asia’s electricity/energy and manufacturing sectors light up as the
+        most intense hotspots, directly reflecting the pattern in the Nature CO₂ hotspot study.
+      </p>
+      <p class="note">
+        <em>Graph interactive cue:</em>
+        Hover over different cells to compare which industries dominate each Asian subregion in the
+        selected year.
+      </p>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section class="card">
+      <div class="header">
+        <h2>Conclusions and Next Steps</h2>
+      </div>
+      <p class="note">
+        Together, these three visualizations show a clear narrative: Asia dominates global greenhouse
+        gas emissions, and within Asia, certain industries and subregions are responsible for the
+        majority of output.
+      </p>
+      <p class="note">
+        This raises important questions for climate policy, especially around how industrial transitions
+        should be supported and how responsibility should be shared across regions. One could also say
+        that it highlights inequality in both emissions and climate impacts.
+      </p>
+      <p class="note">
+        As a next step, it would be interesting to map emissions at a more granular geographic level
+        or to visualize projections to see how these hotspots might change in the future.
+      </p>
+    </section>
+
+    <!-- Sources -->
+    <section class="card">
+      <div class="header">
+        <h2>Sources</h2>
+      </div>
+      <p class="note">
+        United Nations Economic and Social Commission for Asia and the pacific “2024 Review of climate ambition in Asia and the pacific” https://www.unescap.org/kp/2024/climate-ambition-asia-pacific
+      </p>
+      <p class="note">
+        Emerging Carbon Dioxide hotspots in East Asia https://www.nature.com/articles/s43247-024-01991-7?utm_ 
       </p>
     </section>
 
@@ -109,7 +161,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script defer src="./app.js"></script>
-  <script defer src="./radial_asia.js"></script>
   <script defer src="./asia_bar.js"></script>
   <script defer src="./heatmap.js"></script>
 </body>

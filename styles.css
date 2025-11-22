@@ -219,3 +219,84 @@ h1 {
   fill: rgba(37, 99, 235, 0.15);
   stroke: none;
 }
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
+  margin-bottom: 3rem;
+}
+.wrap {
+  max-width: 900px;
+  margin: auto;
+  padding: 2rem 1.5rem;
+}
+
+.top h1 {
+  margin-bottom: 1rem;
+}
+
+.top p {
+  line-height: 1.65;
+}
+body {
+  background: linear-gradient(180deg, #fafafa 0%, #f3f3f7 100%);
+  font-family: "Inter", sans-serif;
+}
+.card .header h2 {
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.card .header::after {
+  content: "";
+  display: block;
+  height: 3px;
+  width: 60px;
+  background: #d8d8ff;
+  border-radius: 3px;
+  margin-top: 0.4rem;
+}
+.card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.note em {
+  background: #eef0ff;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  font-style: normal;
+  font-weight: 500;
+}
+.note {
+  border-left: 4px solid #e3e5ff;
+  padding-left: 12px;
+}
+.top {
+  padding: 2.5rem 1rem 2rem 1rem;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f7f7ff 0%, #fafaff 100%);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+  margin-bottom: 2.5rem;
+}
+
+.top h1 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.top h1::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #d8d8ff;
+  border-radius: 4px;
+  margin-top: 0.4rem;
+}
