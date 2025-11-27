@@ -111,7 +111,7 @@
 
     const color = d3
       .scaleSequential(d3.interpolateYlOrRd)
-      .domain([0, maxVal || 1]);
+      .domain([maxVal * 0.05, maxVal || 1]);
 
     g.append("g")
       .attr("class", "axis x-axis")
@@ -145,12 +145,10 @@
       .ticks(4)
       .tickFormat(d3.format(".1s"));
 
-    const legendGradientId = "heatmap-gradient";
-
     const defs = svg.append("defs");
     const gradient = defs
       .append("linearGradient")
-      .attr("id", legendGradientId)
+      .attr("id", "heatmap-gradient")
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -173,7 +171,7 @@
       .append("rect")
       .attr("width", legendWidth)
       .attr("height", legendHeight)
-      .attr("fill", `url(#${legendGradientId})`);
+      .attr("fill", `url(#heatmap-gradient)`);
 
     legendGroup
       .append("g")
@@ -202,6 +200,7 @@
 
     let rects = g.selectAll("rect.heat-cell");
 
+    
     function render(year) {
       const cells = [];
       industries.forEach(ind => {
@@ -213,44 +212,67 @@
           cells.push({ industry: ind, region, value: v });
         });
       });
-
       rects = rects.data(cells, d => `${d.industry}|${d.region}`);
 
-      rects
-        .enter()
-        .append("rect")
-        .attr("class", "heat-cell")
-        .attr("x", d => x(d.region))
-        .attr("y", d => y(d.industry))
-        .attr("width", x.bandwidth())
-        .attr("height", y.bandwidth())
-        .attr("rx", 4)
-        .attr("ry", 4)
-        .on("mousemove", (event, d) => {
-          const html = `<b>${d.industry}</b><br>${d.region}<br>Year: ${year}<br>Emissions: ${d3.format(
-            ",.0f"
-          )(d.value)} MtCO₂e`;
-          showTip(html, event);
-        })
-        .on("mouseleave", hideTip)
-        .merge(rects)
-        .transition()
-        .duration(400)
-        .attr("fill", d =>
-          d.value ? color(d.value) : "#f8fafc"
-        );
+rects
+  .enter()
+  .append("rect")
+  .attr("class", "heat-cell")
+  .attr("x", d => x(d.region))
+  .attr("y", d => y(d.industry))
+  .attr("width", x.bandwidth())
+  .attr("height", y.bandwidth())
+  .attr("rx", 4)
+  .attr("ry", 4)
+  .on("mousemove", (event, d) => {
+    const html = `<b>${d.industry}</b><br>${d.region}<br>Year: ${year}<br>Emissions: ${d3.format(
+      ",.0f"
+    )(d.value)} MtCO₂e`;
+    showTip(html, event);
+  })
+  .on("mouseleave", hideTip)
 
-      rects.exit().remove();
+  .on("mouseenter", function(event, d) {
+    const rowR = d.region;
+    const colI = d.industry;
+
+    g.selectAll(".heat-cell")
+      .transition().duration(200)
+      .style("opacity", c =>
+        c.region === rowR || c.industry === colI ? 1 : 0.15
+      );
+  })
+  .on("mouseleave", function() {
+    g.selectAll(".heat-cell")
+      .transition().duration(200)
+      .style("opacity", 1);
+  })
+
+  // Merge + update
+  .merge(rects)
+  .transition()
+  .duration(450)
+  .attr("fill", d => (d.value ? color(d.value) : "#f8fafc"));
+
+rects.exit().remove();
+
     }
 
+   
     const initialYear = years[years.length - 1];
     render(initialYear);
 
+   
     if (!yearSelect.empty()) {
       yearSelect.on("change", event => {
-        const year = +event.target.value;
-        render(year);
+        render(+event.target.value);
       });
     }
+
+    window.updateHeatmap = function (year) {
+      const yVal = +year;
+      if (!years.includes(yVal)) return;
+      render(yVal);
+    };
   });
 })();

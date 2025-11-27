@@ -1,253 +1,135 @@
-:root{
-    --bg:#fff; --panel:#f7f8fb; --ink:#111; --muted:#5d6778; --grid:#d6dae2; --shadow:rgba(0,0,0,.08);
-    --chip-bg:#ffffff; --chip-border:#d9dee8;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#0b0d12; --panel:#121620; --ink:#e9edf3; --muted:#93a2b5; --grid:#2b3241; --shadow:rgba(0,0,0,.35);
-      --chip-bg:#151a25; --chip-border:#334055;
-    }
-  }
-  
-  *{box-sizing:border-box}
-  body{margin:0; font:14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--ink); background:var(--bg);}
-  .wrap{max-width:1100px; margin:24px auto; padding:0 16px;}
-  .top h1{margin:0 0 4px; font-size:22px}
-  .sub{margin:0 0 12px; color:var(--muted)}
-  
-  .controls{display:flex; gap:14px; flex-wrap:wrap; align-items:end; margin-bottom:10px}
-  label{color:var(--muted); font-size:13px; display:flex; gap:8px; align-items:center}
-  select{accent-color:#3b82f6}
-  
-  /* Chips */
-  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:2px 0 12px}
-  .chip{
-    display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; cursor:pointer;
-    background:var(--chip-bg); border:1px solid var(--chip-border); user-select:none;
-  }
-  .chip .sw{width:10px; height:10px; border-radius:3px; background:#9aa4b2}
-  .chip.active{outline:2px solid #3b82f6; outline-offset:1px}
-  .chipnote{margin:0 0 8px; color:var(--muted); font-size:12px}
-  
-  /* Card + legend + chart */
-  .card{background:var(--panel); border:1px solid color-mix(in srgb, var(--grid) 80%, transparent); border-radius:16px; padding:12px}
-  h2{margin:0 0 6px; font-size:16px}
-  .note{color:var(--muted); font-size:12px; margin:8px 0 0}
-  
-  .legend{display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 6px}
-  .legend .item{display:flex; gap:6px; align-items:center; padding:4px 8px; border:1px solid color-mix(in srgb, var(--grid) 80%, transparent); border-radius:999px; background:color-mix(in srgb, var(--panel) 85%, white 15%);}
-  .sw{width:12px; height:12px; border-radius:3px; display:inline-block}
-  
-  svg{width:100%; height:auto; display:block}
-  .axis text{fill:var(--muted); font-size:11px}
-  .axis path,.axis line{stroke:var(--grid)}
-  
-  /* Tooltip */
-  .tooltip{
-    position:fixed; pointer-events:none;
-    background:color-mix(in srgb, var(--panel) 85%, black 15%); color:var(--ink);
-    border:1px solid color-mix(in srgb, var(--grid) 70%, transparent);
-    border-radius:10px; padding:8px 10px; font-size:12px; box-shadow:0 8px 24px var(--shadow);
-    opacity:0; transform:translate3d(0,0,0);
-    max-width:320px; z-index:999;
-  }
+/* ================================
+   THEME VARIABLES
+   ================================ */
+:root {
+  /* Base colors */
+  --bg-main: #f5f3eb;        
+  --bg-card: #ffffff;       
+  --ink: #111827;           
+  --muted: #6b7280;          
+  --grid: #d4d4dd;          
+  --shadow-soft: rgba(0, 0, 0, 0.05);
+  --shadow-strong: rgba(0, 0, 0, 0.12);
 
-.legend-group text {
-  font-size: 12px;
-  alignment-baseline: middle;
+  /* Accent colors */
+  --accent-asia: #e07a2d;    
+  --accent-1: #3b5d50;       
+  --accent-2: #4b5563;       
+  --accent-soft: #e2ddd0;    
+
+  
+  --chip-bg: #ffffff;
+  --chip-border: #d9dee8;
 }
 
-/* Line chart section */
-#chartContinent {
-  width: 100%;
-  height: auto;
+/* ================================
+   GLOBAL
+   ================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: radial-gradient(circle at top left, #f9f6ef 0, var(--bg-main) 40%, #f3efe4 100%);
+}
+
+
+.wrap {
+  max-width: 960px;
+  margin: 24px auto 40px;
+  padding: 0 16px;
+}
+
+/* ================================
+   HEADER / INTRO
+   ================================ */
+
+.top {
+  padding: 2.5rem 1.5rem 2rem;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #f6f2e7, #fdfbf6);
+  box-shadow: 0 6px 26px var(--shadow-soft);
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.top h1 {
+  margin: 0 0 0.75rem;
+  font-size: 24px;
+  font-weight: 650;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.top h1::after {
+  content: "";
   display: block;
-  margin-top: 8px;
+  width: 90px;
+  height: 4px;
+  background: var(--accent-asia);
+  border-radius: 4px;
+  margin-top: 0.4rem;
 }
 
+.sub {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+}
+
+/* ================================
+   CARDS / SECTIONS
+   ================================ */
+
+.card {
+  background: var(--bg-card);
+  border-radius: 18px;
+  border: 1px solid var(--accent-soft);
+  padding: 2rem 1.75rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 6px 20px var(--shadow-soft);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.card:nth-of-type(1) { animation-delay: 0.05s; }
+.card:nth-of-type(2) { animation-delay: 0.1s; }
+.card:nth-of-type(3) { animation-delay: 0.15s; }
+.card:nth-of-type(4) { animation-delay: 0.2s; }
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--shadow-strong);
+}
+
+/* Card header with title + controls */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-#gasDropdown {
-  font-size: 14px;
-  padding: 4px 8px;
-}
-
-/* Tooltip for line chart */
-.tooltip {
-  position: absolute;
-  pointer-events: none;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 6px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.subtitle {
-  font-size: 13px;
-  color: var(--muted);
-  margin: 2px 0 6px 0;
-  text-align: left;
-}
-
-line.axis {
-  stroke: #999;
-  stroke-width: 1px;
-  stroke-dasharray: 2,2;
-}
-
-path.subregion {
-  fill: none;
-  stroke-width: 2px;
-}
-
-body { font-family: sans-serif; background: #fafafa; margin:0; padding:20px;}
-svg { width: 100%; height: 500px; display:block; margin:auto; }
-select { margin: 10px; padding: 4px 8px; font-size: 14px; }
-.tooltip {
-  position: fixed; pointer-events: none;
-  background: rgba(255,255,255,0.9); border: 1px solid #aaa; border-radius:6px;
-  padding:6px 10px; font-size:12px; opacity:0; box-shadow:0 4px 12px rgba(0,0,0,0.15);
-}
-/* Race chart styles */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  margin: 20px;
-  background: #f5f5f5;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-#chart-container {
-  max-width: 900px;
-  margin: 0 auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-#chart {
-  width: 100%;
-  height: 500px;
-}
-
-#controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-#controls button {
-  padding: 6px 16px;
-  border-radius: 999px;
-  border: none;
-  background: #333;
-  color: #fff;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-#controls button:hover {
-  opacity: 0.9;
-}
-
-#year-label {
-  font-weight: bold;
-  font-size: 20px;
-  margin-left: 10px;
-}
-
-#note {
-  text-align: center;
-  font-size: 12px;
-  color: #666;
-  margin-top: 8px;
-}
-.radial-bar {
-  stroke: #fff;
-  stroke-width: 1px;
-}
-
-.radial-bar:hover {
-  opacity: 1;
-}
-
-.radial-label {
-  pointer-events: none;
-}
-
-
-/* ---- Heatmap styles ---- */
-.heat-cell {
-  stroke: #f8fafc;
-  stroke-width: 0.5px;
-}
-
-.heatmap-legend text {
-  fill: var(--muted);
-}
-
-/* ---- Lorenz curve styles ---- */
-.lorenz-eq {
-  fill: none;
-  stroke: var(--grid);
-  stroke-width: 1.5px;
-  stroke-dasharray: 4 3;
-}
-
-.lorenz-curve {
-  fill: none;
-  stroke: #2563eb; 
-  stroke-width: 2.5px;
-}
-
-.lorenz-shade {
-  fill: rgba(37, 99, 235, 0.15);
-  stroke: none;
-}
-.card {
-  background: white;
-  padding: 2rem;
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
-  margin-bottom: 3rem;
-}
-.wrap {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem 1.5rem;
-}
-
-.top h1 {
-  margin-bottom: 1rem;
-}
-
-.top p {
-  line-height: 1.65;
-}
-body {
-  background: linear-gradient(180deg, #fafafa 0%, #f3f3f7 100%);
-  font-family: "Inter", sans-serif;
-}
-.card .header h2 {
-  font-weight: 600;
-  font-size: 1.3rem;
+  gap: 1rem;
   margin-bottom: 0.75rem;
 }
+
+.card .header h2 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
 
 .card .header::after {
   content: "";
@@ -258,14 +140,23 @@ body {
   border-radius: 3px;
   margin-top: 0.4rem;
 }
-.card {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+/* ================================
+   TEXT ELEMENTS
+   ================================ */
+
+h2 {
+  font-size: 16px;
 }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+.note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 8px 0 0;
+  border-left: 4px solid #e3e5ff;
+  padding-left: 12px;
 }
+
 .note em {
   background: #eef0ff;
   padding: 0.2rem 0.45rem;
@@ -273,30 +164,322 @@ body {
   font-style: normal;
   font-weight: 500;
 }
-.note {
-  border-left: 4px solid #e3e5ff;
-  padding-left: 12px;
-}
-.top {
-  padding: 2.5rem 1rem 2rem 1rem;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #f7f7ff 0%, #fafaff 100%);
-  box-shadow: 0 4px 18px rgba(0,0,0,0.05);
-  margin-bottom: 2.5rem;
+
+/* ================================
+   CONTROLS (labels, selects, buttons)
+   ================================ */
+
+.controls {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 10px;
 }
 
-.top h1 {
-  position: relative;
+label {
+  color: var(--muted);
+  font-size: 13px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+select {
+  accent-color: var(--accent-asia);
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: var(--ink);
+}
+
+#gasDropdown {
+  font-size: 14px;
+  padding: 4px 8px;
+}
+.mini-btn,
+#asiaBarControls button,
+#playYears,
+#pauseYears {
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.07);
+  background: #111827;
+  color: #f9fafb;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    color 0.15s ease;
+}
+
+.mini-btn:hover,
+#asiaBarControls button:hover,
+#playYears:hover,
+#pauseYears:hover {
+  background: #1f2937;
+  color: #fefce8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.mini-btn:active,
+#asiaBarControls button:active,
+#playYears:active,
+#pauseYears:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+
+/* Small play/pause button group under stacked bars */
+.mini-controls button,
+#asiaBarControls button {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #111827;
+  color: #f9fafb;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.mini-controls button:hover,
+#asiaBarControls button:hover {
+  background: #1f2937;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ================================
+   LEGENDS & CHIPS
+   ================================ */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.legend .item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.sw {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
   display: inline-block;
-  padding-bottom: 0.5rem;
 }
 
-.top h1::after {
-  content: "";
+.legend-group text {
+  font-size: 12px;
+  alignment-baseline: middle;
+}
+
+
+.chipbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 2px 0 12px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  user-select: none;
+  font-size: 12px;
+}
+
+.chip .sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #9aa4b2;
+}
+
+.chip.active {
+  outline: 2px solid var(--accent-asia);
+  outline-offset: 1px;
+}
+
+.chipnote {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ================================
+   SVG / CHARTS / AXES
+   ================================ */
+
+svg {
+  width: 100%;
+  height: auto;
   display: block;
-  width: 80px;
-  height: 4px;
-  background: #d8d8ff;
-  border-radius: 4px;
-  margin-top: 0.4rem;
+}
+
+/* Specific for continent chart container */
+#chartContinent {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 8px;
+}
+
+/* Axes */
+.axis text {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.axis path,
+.axis line {
+  stroke: var(--grid);
+}
+
+line.axis {
+  stroke: #9ca3af;
+  stroke-width: 1px;
+  stroke-dasharray: 2, 2;
+}
+
+/* ================================
+   TOOLTIP (shared for charts)
+   ================================ */
+
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #d4d4d8;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--ink);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  max-width: 320px;
+  z-index: 999;
+}
+
+/* ================================
+   HEATMAP-SPECIFIC STYLES
+   ================================ */
+
+.heat-cell,
+.heatmap-cell {
+  stroke: #f8fafc;
+  stroke-width: 0.5px;
+}
+
+.heatmap-legend text {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================
+   RESPONSIVE
+   ================================ */
+
+@media (max-width: 640px) {
+  .top {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card .header h2 {
+    font-size: 1.1rem;
+  }
+}
+#yearSlider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  outline: none;
+  cursor: pointer;
+}
+
+#yearSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e07a2d; /* Asia accent */
+  box-shadow: 0 0 0 3px rgba(224, 122, 45, 0.25);
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+#yearSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 5px rgba(224, 122, 45, 0.28);
+}
+
+#yearSlider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e07a2d;
+  border: none;
+  box-shadow: 0 0 0 3px rgba(224, 122, 45, 0.25);
+}
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: radial-gradient(circle at top left, #fbf7ec 0, #f5f3eb 45%, #f1ece2 100%);
+}
+
+.top {
+  padding: 2.5rem 1.5rem 2rem;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #f7f2e5, #fdfaf3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
 }

@@ -76,7 +76,13 @@
     const colorC = d3
       .scaleOrdinal()
       .domain(continents)
-      .range(d3.schemeTableau10);
+      .range([
+        "#9b8b6e", 
+        "#e07a2d", 
+        "#4b6a88", 
+        "#78997c", 
+        "#b3565a"  
+     ]);
 
     const xAxisC = d3
       .axisBottom(xC)
@@ -167,6 +173,10 @@
         .attr("stroke", d => colorC(d.region))
         .transition()
         .duration(600)
+        .attr("d", d => line(d.values))
+        .transition()
+        .duration(700)
+        .ease(d3.easeCubicInOut)
         .attr("d", d => line(d.values));
 
       paths.exit().remove();
@@ -387,4 +397,43 @@
       });
     }
   });
+
+let asiaFocused = false;
+
+function applyAsiaFocus() {
+  const lines = d3.select("#chartContinent").selectAll(".continent-line");
+  const points = d3.select("#chartContinent").selectAll(".continent-point");
+
+  lines.transition().duration(300)
+    .style("opacity", d => {
+      if (!asiaFocused) return 1;
+      return d.region === "Asia" ? 1 : 0.15;
+    })
+    .style("stroke-width", d => {
+      if (!asiaFocused) return 2;
+      return d.region === "Asia" ? 4 : 1.2;
+    });
+
+  points.transition().duration(300)
+    .style("opacity", d => {
+      if (!asiaFocused) return 1;
+      return d.region === "Asia" ? 1 : 0.15;
+    })
+    .attr("r", d => {
+      if (!asiaFocused) return 3;
+      return d.region === "Asia" ? 5 : 2;
+    });
+}
+
+document.getElementById("asiaFocusToggle").addEventListener("click", () => {
+  asiaFocused = !asiaFocused;
+  applyAsiaFocus();
+});
+
+const _oldUpdate = updateContinentChart;
+updateContinentChart = function(gas) {
+  _oldUpdate(gas);
+  applyAsiaFocus();
+};
+
 })();

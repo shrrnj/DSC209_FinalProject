@@ -20,12 +20,36 @@
       </p>
       <p class="sub">
         This was a consistent trend that appeared across our dataset, so we decided to dig deeper and use
-        two external sources for context. The two articles we found — the United Nations Economic and Social
+        two external sources for context. The two articles we found the United Nations Economic and Social
         Commission for Asia and the Pacific’s 2024 climate review and the “Emerging Carbon Dioxide Hotspots
-        in East Asia” Nature article — helped us better understand why Asia shows such high emission levels
+        in East Asia” Nature article helped us better understand why Asia shows such high emission levels
         and how our visual findings match broader research.
       </p>
     </header>
+
+    <!-- EXPLORE OVER TIME CONTROL PANEL -->
+<section class="card" id="explorePanel">
+  <div class="header">
+    <h2>Explore Asia’s Emissions Over Time</h2>
+  </div>
+
+  <p class="note">
+    Use the slider to pick a year. The stacked bars and heatmap will sync automatically so you can see
+    how industry and subregion patterns shift over time.
+  </p>
+
+  <div class="controls" style="margin-top: 12px; display:flex; align-items:center; gap:16px;">
+    <label for="yearSlider">
+      Year: <strong id="yearDisplay">2010</strong>
+    </label>
+
+    <input type="range" id="yearSlider" min="2010" max="2023" value="2010" step="1"
+      style="flex-grow:1;">
+
+    <button id="playYears" class="mini-btn">Play</button>
+    <button id="pauseYears" class="mini-btn">Pause</button>
+  </div>
+</section>
 
     <!-- 1. GLOBAL GAS EMISSIONS BY CONTINENT -->
     <section class="card">
@@ -35,6 +59,10 @@
           <label for="gasDropdown">Gas Type:</label>
           <select id="gasDropdown"></select>
         </div>
+        <div style="margin-top:6px;">
+          <button id="asiaFocusToggle" class="mini-btn">Toggle Asia Focus</button>
+        </div>
+
       </div>
 
       <!-- 1st GRAPH -->
@@ -69,6 +97,10 @@
       <!-- 2nd GRAPH -->
       <div id="asiaBarLegend" class="legend"></div>
       <svg id="asiaBarChart" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
+      <p id="asiaBarInfo" class="note">
+        Click a bar to focus on one Asian subregion.
+      </p>
+
 
       <!-- 2nd PARAGRAPH EXPLANATION -->
       <p class="note">
@@ -163,5 +195,6 @@
   <script defer src="./app.js"></script>
   <script defer src="./asia_bar.js"></script>
   <script defer src="./heatmap.js"></script>
+  <script defer src="./controls.js"></script>
 </body>
 </html>
