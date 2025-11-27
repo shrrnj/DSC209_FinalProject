@@ -123,14 +123,14 @@ svg.on("click", function(event) {
     const color = d3.scaleOrdinal()
       .domain(industries)
       .range([
-        "#264653", 
-        "#2a9d8f", 
+        "#166534", 
+        "#3f7f5f", 
         "#8ab17d", 
-        "#e9c46a", 
-        "#f4a261", 
-        "#e76f51", 
-        "#7f5539", 
-        "#6c757d"  
+        "#d9b36f", 
+        "#c97a4a", 
+        "#8f5b3d", 
+        "#6b7280", 
+        "#9ca3af"  
       ]);
 
 

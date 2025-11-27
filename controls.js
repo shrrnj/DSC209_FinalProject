@@ -1,4 +1,4 @@
-const yearSlider = document.getElementById("yearSlider");
+const yearSlider = document.getElementById("yearSlider"); 
 const yearDisplay = document.getElementById("yearDisplay");
 
 const playBtn = document.getElementById("playYears");
@@ -33,3 +33,27 @@ pauseBtn.addEventListener("click", () => {
 
 // Initialize default
 setYear(2010);
+
+const revealTargets = document.querySelectorAll(".top, .card");
+
+const observer = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  },
+  {
+    threshold: 0.12
+  }
+);
+
+revealTargets.forEach(el => observer.observe(el));
+
+const asiaToggleBtn = document.getElementById("asiaFocusToggle");
+if (asiaToggleBtn) {
+  asiaToggleBtn.classList.add("pulse");
+  setTimeout(() => asiaToggleBtn.classList.remove("pulse"), 4000);
+}

@@ -1,6 +1,3 @@
-// app.js
-// Global continent line chart + Asian subregion streamgraph
-
 (function () {
   const FILE = "data/Indicator_1_1_annual_6562429754166382300.csv";
 
@@ -31,8 +28,7 @@
   }
 
   const svgContinent = d3.select("#chartContinent");
-  const svgStream = d3.select("#streamSubregion");
-  if (svgContinent.empty() && svgStream.empty()) return;
+  if (svgContinent.empty()) return;
 
   d3.csv(FILE, d3.autoType).then(data => {
     const yearCols = Object.keys(data[0]).filter(k => /^\d{4}$/.test(k));
@@ -40,9 +36,7 @@
 
     const gasTypes = Array.from(new Set(data.map(d => d["Gas Type"]))).sort();
 
-    // ---------------------------
-    // 1. Continent line chart
-    // ---------------------------
+
     const continents = ["Africa", "Asia", "Europe", "Oceania", "Americas"];
 
     const gasDropdown = d3.select("#gasDropdown");
@@ -73,16 +67,17 @@
     const xC = d3.scaleLinear().domain(d3.extent(years)).range([0, widthC]);
     const yC = d3.scaleLinear().range([heightC, 0]);
 
+    
     const colorC = d3
       .scaleOrdinal()
       .domain(continents)
       .range([
-        "#9b8b6e", 
-        "#e07a2d", 
-        "#4b6a88", 
-        "#78997c", 
-        "#b3565a"  
-     ]);
+        "#9b8b6e", // Africa - muted brown
+        "#166534", // Asia - deep green (accent)
+        "#4b6a88", // Europe - dusty blue
+        "#6b8e62", // Oceania - soft green
+        "#b3565a"  // Americas - muted red
+      ]);
 
     const xAxisC = d3
       .axisBottom(xC)
@@ -114,7 +109,7 @@
       .attr("text-anchor", "middle")
       .attr("fill", "#555")
       .attr("font-size", 12)
-      .text("Gas emissions (Million metric tons of CO2 equivalent)");
+      .text("Gas emissions (Million metric tons of CO₂ equivalent)");
 
     const line = d3
       .line()
@@ -151,6 +146,33 @@
       return series;
     }
 
+    let asiaFocused = false;
+
+    function applyAsiaFocus() {
+      const lines = gC.selectAll(".continent-line");
+      const points = gC.selectAll(".continent-point");
+
+      lines.transition().duration(300)
+        .style("opacity", d => {
+          if (!asiaFocused) return 1;
+          return d.region === "Asia" ? 1 : 0.15;
+        })
+        .style("stroke-width", d => {
+          if (!asiaFocused) return 2;
+          return d.region === "Asia" ? 4 : 1.2;
+        });
+
+      points.transition().duration(300)
+        .style("opacity", d => {
+          if (!asiaFocused) return 1;
+          return d.region === "Asia" ? 1 : 0.15;
+        })
+        .attr("r", d => {
+          if (!asiaFocused) return 3;
+          return d.region === "Asia" ? 5 : 2;
+        });
+    }
+
     function updateContinentChart(gasType) {
       const series = getContinentSeries(gasType);
       const maxY = d3.max(series, s => d3.max(s.values, d => d.value)) || 0;
@@ -169,19 +191,18 @@
         .attr("class", "continent-line")
         .attr("fill", "none")
         .attr("stroke-width", 2)
-        .merge(paths)
         .attr("stroke", d => colorC(d.region))
-        .transition()
-        .duration(600)
         .attr("d", d => line(d.values))
+        .merge(paths)
         .transition()
         .duration(700)
         .ease(d3.easeCubicInOut)
+        .attr("stroke", d => colorC(d.region))
         .attr("d", d => line(d.values));
 
       paths.exit().remove();
 
-      // points for tooltip
+      
       const points = gC
         .selectAll(".continent-point")
         .data(
@@ -211,6 +232,9 @@
         .attr("cy", d => yC(d.value));
 
       points.exit().remove();
+
+      
+      applyAsiaFocus();
     }
 
     const initialGas = !gasDropdown.empty()
@@ -225,215 +249,13 @@
       });
     }
 
-    // ---------------------------
-    // 2. Asian subregions streamgraph
-    // ---------------------------
-    const subregions = [
-      "Central Asia",
-      "Eastern Asia",
-      "South-eastern Asia",
-      "Southern Asia",
-      "Western Asia"
-    ];
-
-    const gasDropdownSub = d3.select("#gasDropdownSubregion");
-    if (!gasDropdownSub.empty()) {
-      gasDropdownSub
-        .selectAll("option")
-        .data(gasTypes)
-        .join("option")
-        .attr("value", d => d)
-        .text(d => d);
-
-      gasDropdownSub.property("value", initialGas);
-    }
-
-    const marginS = { top: 40, right: 40, bottom: 40, left: 60 };
-    const widthS = 960 - marginS.left - marginS.right;
-    const heightS = 500 - marginS.top - marginS.bottom;
-
-    svgStream.attr(
-      "viewBox",
-      `0 0 ${widthS + marginS.left + marginS.right} ${
-        heightS + marginS.top + marginS.bottom
-      }`
-    );
-
-    const gS = svgStream
-      .append("g")
-      .attr("transform", `translate(${marginS.left},${marginS.top})`);
-
-    const xS = d3.scaleLinear().domain(d3.extent(years)).range([0, widthS]);
-    const yS = d3.scaleLinear().range([heightS, 0]);
-
-    const colorS = d3
-      .scaleOrdinal()
-      .domain(subregions)
-      .range(d3.schemeTableau10);
-
-    const xAxisS = d3
-      .axisBottom(xS)
-      .ticks(years.length)
-      .tickFormat(d3.format("d"));
-    const yAxisS = d3
-      .axisLeft(yS)
-      .ticks(5)
-      .tickFormat(d3.format(","));
-
-    gS.append("g")
-      .attr("class", "axis x-axis")
-      .attr("transform", `translate(0,${heightS})`);
-
-    gS.append("g").attr("class", "axis y-axis");
-
-    gS.append("text")
-      .attr("x", widthS / 2)
-      .attr("y", heightS + 35)
-      .attr("text-anchor", "middle")
-      .attr("fill", "#555")
-      .attr("font-size", 12)
-      .text("Year");
-
-    gS.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("x", -heightS / 2)
-      .attr("y", -45)
-      .attr("text-anchor", "middle")
-      .attr("fill", "#555")
-      .attr("font-size", 12)
-      .text("Gas emissions (Million metric tons of CO2 equivalent)");
-
-    const area = d3
-      .area()
-      .x(d => xS(d.data.year))
-      .y0(d => yS(d[0]))
-      .y1(d => yS(d[1]));
-
-    function prepareStreamData(gasType) {
-      const filtered = data.filter(
-        d =>
-          d["Gas Type"] === gasType &&
-          subregions.includes((d.Country || "").trim())
-      );
-
-      const byKey = new Map(); // key: region|year
-      filtered.forEach(row => {
-        const region = row.Country.trim();
-        yearCols.forEach(yStr => {
-          const year = +yStr;
-          const val = +row[yStr] || 0;
-          if (!val) return;
-          const key = `${region}|${year}`;
-          byKey.set(key, (byKey.get(key) || 0) + val);
-        });
-      });
-
-      const records = years.map(year => {
-        const obj = { year };
-        subregions.forEach(region => {
-          obj[region] = byKey.get(`${region}|${year}`) || 0;
-        });
-        return obj;
-      });
-
-      return records;
-    }
-
-    function updateStream(gasType) {
-      const streamData = prepareStreamData(gasType);
-
-      const stack = d3
-        .stack()
-        .keys(subregions)
-        .order(d3.stackOrderNone)
-        .offset(d3.stackOffsetWiggle);
-
-      const layers = stack(streamData);
-
-      const yExtent = d3.extent(layers.flat(2));
-      yS.domain(yExtent);
-
-      gS.select(".x-axis").call(xAxisS);
-      gS.select(".y-axis").call(yAxisS);
-
-      const layersSel = gS
-        .selectAll(".stream-layer")
-        .data(layers, d => d.key);
-
-      layersSel
-        .enter()
-        .append("path")
-        .attr("class", "stream-layer")
-        .attr("fill", d => colorS(d.key))
-        .attr("fill-opacity", 0.9)
-        .on("mousemove", (event, layer) => {
-          const [xPos] = d3.pointer(event);
-          const yearFloat = xS.invert(xPos);
-          const nearestYear = years.reduce((a, b) =>
-            Math.abs(b - yearFloat) < Math.abs(a - yearFloat) ? b : a
-          );
-          const record = streamData.find(r => r.year === nearestYear);
-          const value = record ? record[layer.key] : 0;
-          const html = `<b>${layer.key}</b><br>Year: ${nearestYear}<br>${gasType}: ${d3.format(
-            ",.0f"
-          )(value)} MtCO₂e`;
-          showTip(html, event);
-        })
-        .on("mouseleave", hideTip)
-        .merge(layersSel)
-        .transition()
-        .duration(700)
-        .attr("d", area);
-
-      layersSel.exit().remove();
-    }
-
-    updateStream(initialGas);
-
-    if (!gasDropdownSub.empty()) {
-      gasDropdownSub.on("change", event => {
-        const gasType = event.target.value;
-        updateStream(gasType);
+    
+    const asiaToggleBtn = document.getElementById("asiaFocusToggle");
+    if (asiaToggleBtn) {
+      asiaToggleBtn.addEventListener("click", () => {
+        asiaFocused = !asiaFocused;
+        applyAsiaFocus();
       });
     }
   });
-
-let asiaFocused = false;
-
-function applyAsiaFocus() {
-  const lines = d3.select("#chartContinent").selectAll(".continent-line");
-  const points = d3.select("#chartContinent").selectAll(".continent-point");
-
-  lines.transition().duration(300)
-    .style("opacity", d => {
-      if (!asiaFocused) return 1;
-      return d.region === "Asia" ? 1 : 0.15;
-    })
-    .style("stroke-width", d => {
-      if (!asiaFocused) return 2;
-      return d.region === "Asia" ? 4 : 1.2;
-    });
-
-  points.transition().duration(300)
-    .style("opacity", d => {
-      if (!asiaFocused) return 1;
-      return d.region === "Asia" ? 1 : 0.15;
-    })
-    .attr("r", d => {
-      if (!asiaFocused) return 3;
-      return d.region === "Asia" ? 5 : 2;
-    });
-}
-
-document.getElementById("asiaFocusToggle").addEventListener("click", () => {
-  asiaFocused = !asiaFocused;
-  applyAsiaFocus();
-});
-
-const _oldUpdate = updateContinentChart;
-updateContinentChart = function(gas) {
-  _oldUpdate(gas);
-  applyAsiaFocus();
-};
-
 })();
