@@ -34,17 +34,23 @@
 
 body {
   margin: 0;
-  padding: 0;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
   line-height: 1.6;
   color: var(--ink);
-  background: radial-gradient(circle at top left, #f9f6ef 0, var(--bg-main) 40%, #f3efe4 100%);
+
+  /* 🌫 Pollution background image */
+  background:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.65)),
+    url("Air-pollution-city.webp");
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;  
 }
 
 
 .wrap {
-  max-width: 960px;
+  max-width: 1900px;
   margin: 24px auto 40px;
   padding: 0 16px;
 }
@@ -90,7 +96,13 @@ body {
 /* ================================
    CARDS / SECTIONS
    ================================ */
-
+.card, .card-global, .card-industries, .card-hotspots, .card-full {
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(6px);
+  padding: 2rem 1.5rem;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+}
 .card {
   background: var(--bg-card);
   border-radius: 18px;
@@ -466,14 +478,6 @@ line.axis {
   border: none;
   box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.25);
 }
-body {
-  margin: 0;
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink);
-  background: radial-gradient(circle at top left, #fbf7ec 0, #f5f3eb 45%, #f1ece2 100%);
-}
 
 .top {
   padding: 2.5rem 1.5rem 2rem;
@@ -496,10 +500,7 @@ body {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
-body {
-  background: radial-gradient(circle at top left, #fbf7ec 0, #f4f1e7 45%, #eee4d5 100%);
-  animation: bgShift 18s ease-in-out infinite alternate;
-}
+
 
 @keyframes bgShift {
   0% {
@@ -524,4 +525,77 @@ body {
   100% {
     box-shadow: 0 0 0 14px rgba(22, 101, 52, 0);
   }
+  
+}
+.card-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.card-split .viz-panel {
+  flex: 2 1 55%;
+  min-width: 260px;
+}
+
+.card-split .text-panel {
+  flex: 1 1 35%;
+  min-width: 220px;
+  align-self: center;
+}
+
+@media (max-width: 799px) {
+  .card-split {
+    flex-direction: column;
+  }
+}
+.card-hotspots {
+  background: radial-gradient(circle at top left, #f8faf5 0, #ffffff 40%);
+}
+.section-label {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.cards-grid {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+/* Mobile: single column */
+@media (max-width: 799px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop: 2-column layout */
+@media (min-width: 800px) {
+  .cards-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
+    align-items: flex-start;
+  }
+
+ 
+  .card-full {
+    grid-column: 1 / -1;
+  }
+}
+.card svg {
+  width: 100%;
+  max-width: 1400px;   
+  margin: 0 auto;
+  display: block;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at bottom, rgba(0,0,0,0.6), transparent 60%);
 }
