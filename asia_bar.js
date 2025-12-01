@@ -121,17 +121,21 @@ svg.on("click", function(event) {
     const y = d3.scaleBand().domain(subregions).range([0, height]).padding(0.35);
 
     const color = d3.scaleOrdinal()
-      .domain(industries)
-      .range([
-        "#166534", 
-        "#3f7f5f", 
-        "#8ab17d", 
-        "#d9b36f", 
-        "#c97a4a", 
-        "#8f5b3d", 
-        "#6b7280", 
-        "#9ca3af"  
-      ]);
+  .domain(industries)
+  .range([
+    "#000000ff", 
+    "#faff64ff", 
+    "#b97bbfff", 
+    "#fc5c00ff", 
+    "#264a20ff", 
+    "#906a51ff", 
+    "#095891ff", 
+    "#c0c0c0ff",
+    "#bf228dff", 
+    "#7db987ff",
+  ]);
+
+
 
 
     gx.call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".2s")));

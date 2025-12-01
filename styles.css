@@ -599,3 +599,6 @@ body::before {
   z-index: -1;
   background: radial-gradient(circle at bottom, rgba(0,0,0,0.6), transparent 60%);
 }
+#explorePanel {
+  display: none !important;
+}
