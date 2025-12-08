@@ -234,46 +234,9 @@ label[for="gasDropdown"] {
   font-size: 14px;
   padding: 4px 8px;
 }
-.mini-btn,
-#asiaBarControls button,
-#playYears,
-#pauseYears {
-  padding: 6px 14px;
-  font-size: 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.07);
-  background: #111827;
-  color: #f9fafb;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition:
-    background 0.15s ease,
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    color 0.15s ease;
-}
-
-.mini-btn:hover,
-#asiaBarControls button:hover,
-#playYears:hover,
-#pauseYears:hover {
-  background: #1f2937;
-  color: #fefce8;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-  transform: translateY(-1px);
-}
-
-.mini-btn:active,
-#asiaBarControls button:active,
-#playYears:active,
-#pauseYears:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-}
-
 
 /* Small play/pause button group under stacked bars */
-.mini-controls button,
+/* .mini-controls button,
 #asiaBarControls button {
   padding: 4px 10px;
   font-size: 12px;
@@ -290,7 +253,54 @@ label[for="gasDropdown"] {
   background: #1f2937;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
+} */
+
+/* Base style for the control container */
+.mini-controls {
+  display: flex;
+  gap: 12px; /* space between buttons */
+  align-items: center;
 }
+
+/* Base style for all buttons in this group */
+#asiaBarControls button {
+  padding: 10px 20px;       /* bigger padding */
+  font-size: 16px;          /* larger text */
+  border-radius: 12px;      /* rounded corners */
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;                 /* space between icon and text */
+}
+
+/* Play button: green background, white text */
+#asiaBarPlay {
+  background-color: #22c55e; /* green */
+  color: #ffffff;
+}
+
+#asiaBarPlay:hover {
+  background-color: #16a34a; /* darker green on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Pause button: white background, dark text */
+#asiaBarPause {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+#asiaBarPause:hover {
+  background-color: #f3f4f6; /* light gray on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
 
 /* ================================
    LEGENDS & CHIPS
@@ -684,5 +694,15 @@ body::before {
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* subtle depth */
   font-weight: 500;          /* makes it slightly bolder */
+}
+#asiaBarPlay {
+  background-color: #255f3b !important; /* green */
+  color: #ffffff !important;
+}
+
+#asiaBarPause {
+  background-color: #ffffff !important; /* white */
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
 }
 

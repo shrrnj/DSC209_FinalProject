@@ -20,18 +20,7 @@
   const height = vh - margin.top - margin.bottom;
 
   svg.attr("viewBox", `0 0 ${vw} ${vh}`);
-
   const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
-
-  svg.on("click", function(event) {
-    if (event.target.tagName === "svg") {
-      g.selectAll(".asia-bar-seg")
-        .transition().duration(300)
-        .style("opacity", 1);
-
-      d3.select("#asiaBarInfo").html("Click a bar to focus on one subregion.");
-    }
-  });
 
   const gx = g.append("g").attr("class", "axis axis-x").attr("transform", `translate(0,${height})`);
   const gy = g.append("g").attr("class", "axis axis-y");
@@ -52,7 +41,6 @@
 
     const pad = 10;
     const { clientWidth: w, clientHeight: h } = tipEl;
-
     let xPos = evt.clientX + 16;
     let yPos = evt.clientY - h - 16;
 
@@ -77,18 +65,13 @@
     const yearCols = Object.keys(data[0]).filter(k => /^\d{4}$/.test(k));
     const years = yearCols.map(Number).sort((a, b) => a - b);
 
-    // Get all unique industries
     const industrySet = new Set();
     filtered.forEach(d => { if (d.Industry) industrySet.add(d.Industry); });
     const industries = Array.from(industrySet).sort();
 
-    // Consistent color mapping for all industries
     const color = d3.scaleOrdinal()
       .domain(industries)
-      .range([
-        "#faff64ff", "#b97bbfff", "#fc5c00ff", "#264a20ff",
-        "#906a51ff", "#095891ff"
-      ]);
+      .range(["#faff64ff", "#b97bbfff", "#fc5c00ff", "#264a20ff", "#906a51ff", "#095891ff"]);
 
     const totalsByYear = {};
     let globalMaxTotal = 0;
@@ -169,96 +152,86 @@
     }
 
     function render(year, animate = true) {
-  yearText.text(`Year: ${year}`);
+      yearText.text(`Year: ${year}`);
 
-  // Get top 5 industries across all subregions for this year
-  const bySub = totalsByYear[year] || new Map();
-  const industryTotals = new Map();
-  subregions.forEach(region => {
-    const m = bySub.get(region) || new Map();
-    m.forEach((val, ind) => industryTotals.set(ind, (industryTotals.get(ind) || 0) + val));
-  });
+      const bySub = totalsByYear[year] || new Map();
+      const industryTotals = new Map();
+      subregions.forEach(region => {
+        const m = bySub.get(region) || new Map();
+        m.forEach((val, ind) => industryTotals.set(ind, (industryTotals.get(ind) || 0) + val));
+      });
 
-  const top5Industries = Array.from(industryTotals.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(d => d[0]);
+      const top5Industries = Array.from(industryTotals.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(d => d[0]);
 
-  // Update legend
-  drawLegend(top5Industries);
+      drawLegend(top5Industries);
 
-  // Build segments for stacked bars
-  const dataSegs = buildSegments(year, top5Industries);
-  const t = animate ? g.transition().duration(700).ease(d3.easeCubicInOut) : g;
+      const dataSegs = buildSegments(year, top5Industries);
+      const t = animate ? g.transition().duration(700).ease(d3.easeCubicInOut) : g;
 
-  // --- Bars ---
-  segments = segments.data(dataSegs, d => `${d.region}|${d.industry}`);
-  segments.enter()
-    .append("rect")
-    .attr("class", "asia-bar-seg")
-    .attr("y", d => y(d.region))
-    .attr("height", y.bandwidth())
-    .attr("x", d => x(d.x0))
-    .attr("width", d => x(d.x1) - x(d.x0))
-    .attr("fill", d => color(d.industry))
-    .attr("opacity", 0.9)
-    .on("mousemove", (event, d) => {
-      showTip(`<b>${d.region}</b><br>Industry: <b>${d.industry}</b><br>Year: ${d.year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`, event);
-    })
-    .on("mouseleave", hideTip)
-    .on("click", (event, d) => {
-      const sub = d.region;
-      g.selectAll(".asia-bar-seg")
-        .transition().duration(300)
-        .style("opacity", seg => seg.region === sub ? 1 : 0.25);
+      segments = segments.data(dataSegs, d => `${d.region}|${d.industry}`);
+      segments.enter()
+        .append("rect")
+        .attr("class", "asia-bar-seg")
+        .attr("y", d => y(d.region))
+        .attr("height", y.bandwidth())
+        .attr("x", d => x(d.x0))
+        .attr("width", d => x(d.x1) - x(d.x0))
+        .attr("fill", d => color(d.industry))
+        .attr("opacity", 0.9)
+        .on("mousemove", (event, d) => {
+          showTip(`<b>${d.region}</b><br>Industry: <b>${d.industry}</b><br>Year: ${d.year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`, event);
+        })
+        .on("mouseleave", hideTip)
+        .on("click", (event, d) => {
+          const sub = d.region;
+          g.selectAll(".asia-bar-seg")
+            .transition().duration(300)
+            .style("opacity", seg => seg.region === sub ? 1 : 0.25);
+          d3.select("#asiaBarInfo").html(`<strong>Focused on: ${sub}</strong><br>Click empty space to reset.`);
+          event.stopPropagation();
+        })
+        .merge(segments)
+        .transition(t)
+        .attr("y", d => y(d.region))
+        .attr("height", y.bandwidth())
+        .attr("x", d => x(d.x0))
+        .attr("width", d => x(d.x1) - x(d.x0));
 
-      d3.select("#asiaBarInfo").html(`<strong>Focused on: ${sub}</strong><br>Click empty space to reset.`);
-      event.stopPropagation();
-    })
-    .merge(segments)
-    .transition(t)
-    .attr("y", d => y(d.region))
-    .attr("height", y.bandwidth())
-    .attr("x", d => x(d.x0))
-    .attr("width", d => x(d.x1) - x(d.x0));
+      segments.exit().transition().duration(300).attr("opacity", 0).remove();
 
-  segments.exit().transition().duration(300).attr("opacity", 0).remove();
+      const totalLabels = g.selectAll(".bar-total")
+        .data(subregions.map(region => {
+          const regionSegs = dataSegs.filter(d => d.region === region);
+          const total = regionSegs.length ? regionSegs[regionSegs.length - 1].x1 : 0;
+          return { region, total };
+        }), d => d.region);
 
-  // --- Total labels at end of each bar ---
-  const totalLabels = g.selectAll(".bar-total")
-    .data(subregions.map(region => {
-      const regionSegs = dataSegs.filter(d => d.region === region);
-      const total = regionSegs.length ? regionSegs[regionSegs.length - 1].x1 : 0;
-      return { region, total };
-    }), d => d.region);
+      totalLabels.enter()
+        .append("text")
+        .attr("class", "bar-total")
+        .attr("y", d => y(d.region) + y.bandwidth() / 2)
+        .attr("x", d => x(d.total) + 6)
+        .attr("fill", "#111")
+        .attr("font-size", "12px")
+        .attr("alignment-baseline", "middle")
+        .merge(totalLabels)
+        .transition(t)
+        .attr("y", d => y(d.region) + y.bandwidth() / 2)
+        .attrTween("x", function(d) {
+          const i = d3.interpolateNumber(this._currentX || 0, x(d.total) + 6);
+          this._currentX = x(d.total) + 6;
+          return t => i(t);
+        })
+        .text(d => d3.format(",.0f")(d.total));
 
-  totalLabels.enter()
-    .append("text")
-    .attr("class", "bar-total")
-    .attr("y", d => y(d.region) + y.bandwidth() / 2)
-    .attr("x", d => x(d.total) + 6)
-    .attr("fill", "#111")
-    .attr("font-size", "12px")
-    .attr("alignment-baseline", "middle")
-    .merge(totalLabels)
-    .transition(t)
-    .attr("y", d => y(d.region) + y.bandwidth() / 2)
-    .attrTween("x", function(d) {
-    const i = d3.interpolateNumber(this._currentX || 0, x(d.total) + 6);
-    this._currentX = x(d.total) + 6;
-    return t => i(t);
-  })
-    .text(d => d3.format(",.0f")(d.total));
-
-  totalLabels.exit().transition(t)
-  .attr("opacity", 0)
-  .remove();
-}
-
+      totalLabels.exit().transition(t).attr("opacity", 0).remove();
+    }
 
     const playBtn = d3.select("#asiaBarPlay");
     const pauseBtn = d3.select("#asiaBarPause");
-
     const frameDuration = 1000;
     let currentYearIndex = 0;
     let timer = null;
@@ -280,21 +253,33 @@
       }
     }
 
-    currentYearIndex = 0;
+    function resetBars() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      currentYearIndex = 0;
+      g.selectAll(".asia-bar-seg").remove();
+      g.selectAll(".bar-total").remove();
+      yearText.text(`Year: ${years[currentYearIndex]}`);
+    }
+
+    // Initial render
     render(years[currentYearIndex], false);
 
+    // Play button
     playBtn.on("click", () => {
-      if (timer) return;
-      if (currentYearIndex >= years.length - 1) currentYearIndex = 0;
+      resetBars();
       timer = setInterval(step, frameDuration);
       step();
     });
 
+    // Pause button
     pauseBtn.on("click", () => {
       if (timer) {
         clearInterval(timer);
         timer = null;
       }
     });
+
   });
 })();
+
