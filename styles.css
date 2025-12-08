@@ -564,27 +564,9 @@ line.axis {
   display: grid;
   gap: 24px;
   margin-top: 24px;
+  grid-template-columns: 1fr;
 }
 
-/* Mobile: single column */
-@media (max-width: 799px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Desktop: 2-column layout */
-@media (min-width: 800px) {
-  .cards-grid {
-    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.2fr);
-    align-items: flex-start;
-  }
-
- 
-  .card-full {
-    grid-column: 1 / -1;
-  }
-}
 .card svg {
   width: 100%;
   max-width: 1400px;   
