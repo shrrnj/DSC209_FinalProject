@@ -58,40 +58,60 @@ body {
 /* ================================
    HEADER / INTRO
    ================================ */
-
+/* Hero header wrapper */
+/* Hero header with background */
 .top {
-  padding: 2.5rem 1.5rem 2rem;
-  border-radius: 20px;
-  background: linear-gradient(145deg, #f6f2e7, #fdfbf6);
-  box-shadow: 0 6px 26px var(--shadow-soft);
-  margin-bottom: 2.5rem;
-  opacity: 0;
-  transform: translateY(12px);
+  text-align: center;
+  padding: 3rem 1.5rem 2rem;
+  color: #ffffff; /* white text */
+  background: url("Air-pollution-city.webp") center top / cover no-repeat;
 }
 
+/* Large hero title */
 .top h1 {
-  margin: 0 0 0.75rem;
-  font-size: 24px;
-  font-weight: 650;
-  position: relative;
-  display: inline-block;
-  padding-bottom: 0.5rem;
+  font-size: 3rem; /* adjust as needed */
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 2rem;
 }
 
-.top h1::after {
-  content: "";
-  display: block;
-  width: 90px;
-  height: 4px;
-  background: var(--accent-asia);
-  border-radius: 4px;
-  margin-top: 0.4rem;
+/* Smaller paragraph text */
+.top .sub {
+  font-size: 1rem; /* smaller than h1 */
+  line-height: 1.5;
+  margin: 0.75rem auto;
+  max-width: 700px; /* optional, keeps text readable */
 }
 
-.sub {
-  margin: 0 0 0.75rem;
-  color: var(--muted);
+/* Highlighted bold, centered line */
+.top .highlight {
+  font-size: 1.2rem; /* slightly bigger than sub text */
+  font-weight: 700;
+  text-align: center;
+  margin: 1rem auto;
+  max-width: 700px; /* optional for readability */
+  color: #ffffff;   /* white text */
 }
+
+/* Paragraphs over full width but centered */
+.top .sub,
+.top .highlight {
+  font-size: 1rem;        /* smaller than h1 */
+  line-height: 1.5;
+  margin: 0.75rem 0;      /* vertical spacing */
+  text-align: center;     /* center text horizontally */
+  color: #ffffff;         /* white text */
+  max-width: none;        /* allow full width */
+  padding: 0 16px;        /* small padding for readability on mobile */
+}
+
+/* Highlighted bold line */
+.top .highlight {
+  font-size: 1.2rem;      /* slightly bigger than sub text */
+  font-weight: 700;
+}
+
+
 
 /* ================================
    CARDS / SECTIONS
@@ -479,12 +499,7 @@ line.axis {
   box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.25);
 }
 
-.top {
-  padding: 2.5rem 1.5rem 2rem;
-  border-radius: 20px;
-  background: linear-gradient(145deg, #f7f2e5, #fdfaf3);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.07);
-}
+
 .top,
 .card {
   opacity: 0;
@@ -557,7 +572,7 @@ line.axis {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--muted);
+  color: #ffffff;
 }
 
 .cards-grid {
