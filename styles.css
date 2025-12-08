@@ -225,6 +225,11 @@ select {
   color: var(--ink);
 }
 
+/* Gas Type label */
+label[for="gasDropdown"] {
+  color: #ffffff; /* white text */
+}
+
 #gasDropdown {
   font-size: 14px;
   padding: 4px 8px;
@@ -527,11 +532,24 @@ line.axis {
 }
 #asiaFocusToggle {
   position: relative;
+  color: #ffffff;
+  background-color: #4caf50; /* lighter green background */
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+#asiaFocusToggle:hover {
+  background-color: #66bb6a; /* slightly brighter on hover */
 }
 
 #asiaFocusToggle.pulse {
   animation: pulseOutline 1.6s ease-out 0.8s 2;
 }
+
 
 @keyframes pulseOutline {
   0% {
@@ -600,3 +618,71 @@ body::before {
 #explorePanel {
   display: none !important;
 }
+/* Box-free but keeps inner spacing for text and charts */
+.card.no-box {
+  background: transparent;   /* remove background */
+  border: none;              /* remove border */
+  box-shadow: none;          /* remove shadow */
+  border-radius: 0;          /* remove rounded corners */
+  padding: 1rem 0;           /* keep vertical spacing */
+  margin-bottom: 2rem;       /* spacing between sections */
+  color: #ffffff; /* white text for all content inside */
+
+}
+
+.card.no-box .header,
+.card.no-box .note,
+.card.no-box svg {
+  padding: 0 16px;           /* horizontal padding for readability */
+  color: #ffffff; /* white text for all content inside */
+
+}
+
+.card.no-box svg {
+  margin: 0 auto;            /* center the chart */
+  display: block;
+  color: #ffffff; /* white text for all content inside */
+
+}
+
+/* Heatmap text (labels, axes, legend) */
+#heatmapIndustries text,
+.heatmap-legend text {
+  fill: #ffffff !important; /* make all text white */
+}
+
+/* All text inside the continent chart */
+#chartContinent text,
+.axis text {
+  fill: #ffffff !important;  /* make all text white */
+}
+/* All text inside Asia bar chart SVG */
+#asiaBarChart text,
+#asiaBarChart .axis text {
+  fill: #ffffff !important; /* white text */
+}
+
+/* Any legend text inside Asia bar chart */
+#asiaBarLegend text {
+  fill: #ffffff !important;
+}
+
+/* Controls under the bar chart */
+#asiaBarControls button,
+#asiaBarControls label {
+  color: #ffffff; /* white text */
+}
+
+.conclusion {
+  font-size: 1.1rem;        /* slightly larger for emphasis */
+  line-height: 1.6;         /* improves readability */
+  color: #333;              /* dark but softer than pure black */
+  background-color: #f9f9f9; /* subtle light background to highlight */
+  border-left: 4px solid #4caf50; /* visual accent on the left */
+  padding: 16px 20px;
+  margin-top: 20px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* subtle depth */
+  font-weight: 500;          /* makes it slightly bolder */
+}
+
