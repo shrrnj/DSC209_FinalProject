@@ -51,7 +51,7 @@
       gasDropdown.property("value", "Carbon dioxide");
     }
 
-    const marginC = { top: 40, right: 40, bottom: 50, left: 80 };
+    const marginC = { top: 40, right: 100, bottom: 50, left: 80 }; // increase right margin to 100
     const widthC = 960 - marginC.left - marginC.right;
     const heightC = 500 - marginC.top - marginC.bottom;
 
@@ -59,6 +59,7 @@
       "viewBox",
       `0 0 ${widthC + marginC.left + marginC.right} ${heightC + marginC.top + marginC.bottom}`
     );
+
 
     const gC = svgContinent
       .append("g")
@@ -75,9 +76,10 @@
         "#9b8b6e", // Africa - muted brown
         "#166534", // Asia - deep green (accent)
         "#4b6a88", // Europe - dusty blue
-        "#6b8e62", // Oceania - soft green
+        "#a3dd95ff", // Oceania - soft green
         "#b3565a"  // Americas - muted red
       ]);
+
 
     const xAxisC = d3
       .axisBottom(xC)
@@ -148,94 +150,151 @@
 
     let asiaFocused = false;
 
-    function applyAsiaFocus() {
-      const lines = gC.selectAll(".continent-line");
-      const points = gC.selectAll(".continent-point");
+function applyAsiaFocus() {
+  const lines = gC.selectAll(".continent-line");
+  const points = gC.selectAll(".continent-point");
+  const labels = gC.selectAll(".line-label");
 
-      lines.transition().duration(300)
-        .style("opacity", d => {
-          if (!asiaFocused) return 1;
-          return d.region === "Asia" ? 1 : 0.15;
-        })
-        .style("stroke-width", d => {
-          if (!asiaFocused) return 2;
-          return d.region === "Asia" ? 4 : 1.2;
-        });
+  lines.transition().duration(300)
+    .style("opacity", d => asiaFocused ? (d.region === "Asia" ? 1 : 0.15) : 1)
+    .style("stroke-width", d => asiaFocused ? (d.region === "Asia" ? 4 : 1.2) : 2);
 
-      points.transition().duration(300)
-        .style("opacity", d => {
-          if (!asiaFocused) return 1;
-          return d.region === "Asia" ? 1 : 0.15;
-        })
-        .attr("r", d => {
-          if (!asiaFocused) return 3;
-          return d.region === "Asia" ? 5 : 2;
-        });
-    }
+  points.transition().duration(300)
+    .style("opacity", d => asiaFocused ? (d.region === "Asia" ? 1 : 0.15) : 1)
+    .attr("r", d => asiaFocused ? (d.region === "Asia" ? 5 : 2) : 3);
 
-    function updateContinentChart(gasType) {
-      const series = getContinentSeries(gasType);
-      const maxY = d3.max(series, s => d3.max(s.values, d => d.value)) || 0;
-      yC.domain([0, maxY * 1.05]);
+  labels.transition().duration(300)
+    .attr("font-weight", d => asiaFocused && d.region === "Asia" ? "bold" : "normal")
+    .style("opacity", d => asiaFocused ? (d.region === "Asia" ? 1 : 0.5) : 1);
+}
 
-      gC.select(".x-axis").call(xAxisC);
-      gC.select(".y-axis").call(yAxisC);
 
-      const paths = gC
-        .selectAll(".continent-line")
-        .data(series, d => d.region);
+ function updateContinentChart(gasType) {
+  const series = getContinentSeries(gasType);
+  const maxY = d3.max(series, s => d3.max(s.values, d => d.value)) || 0;
+  yC.domain([0, maxY * 1.05]);
 
-      paths
-        .enter()
-        .append("path")
-        .attr("class", "continent-line")
-        .attr("fill", "none")
-        .attr("stroke-width", 2)
-        .attr("stroke", d => colorC(d.region))
-        .attr("d", d => line(d.values))
-        .merge(paths)
-        .transition()
-        .duration(700)
-        .ease(d3.easeCubicInOut)
-        .attr("stroke", d => colorC(d.region))
-        .attr("d", d => line(d.values));
+  gC.select(".x-axis").call(xAxisC);
+  gC.select(".y-axis").call(yAxisC);
 
-      paths.exit().remove();
+  // --- Lines ---
+  const paths = gC
+    .selectAll(".continent-line")
+    .data(series, d => d.region);
 
-      
-      const points = gC
-        .selectAll(".continent-point")
-        .data(
-          series.flatMap(s =>
-            s.values.map(v => ({ region: s.region, ...v }))
-          ),
-          d => `${d.region}|${d.year}`
-        );
+  paths
+    .enter()
+    .append("path")
+    .attr("class", "continent-line")
+    .attr("fill", "none")
+    .attr("stroke-width", 2)
+    .attr("stroke", d => colorC(d.region))
+    .attr("d", d => line(d.values))
+    .merge(paths)
+    .transition()
+    .duration(700)
+    .ease(d3.easeCubicInOut)
+    .attr("stroke", d => colorC(d.region))
+    .attr("d", d => line(d.values));
 
-      points
-        .enter()
-        .append("circle")
-        .attr("class", "continent-point")
-        .attr("r", 3)
-        .attr("fill", d => colorC(d.region))
-        .on("mousemove", (event, d) => {
-          const html = `<b>${d.region}</b><br>Year: ${d.year}<br>${gasType}: ${d3.format(
-            ",.0f"
-          )(d.value)} MtCO₂e`;
-          showTip(html, event);
-        })
-        .on("mouseleave", hideTip)
-        .merge(points)
-        .transition()
-        .duration(600)
-        .attr("cx", d => xC(d.year))
-        .attr("cy", d => yC(d.value));
+  paths.exit().remove();
 
-      points.exit().remove();
+  // --- Points ---
+  const points = gC
+    .selectAll(".continent-point")
+    .data(
+      series.flatMap(s =>
+        s.values.map(v => ({ region: s.region, ...v }))
+      ),
+      d => `${d.region}|${d.year}`
+    );
 
-      
-      applyAsiaFocus();
-    }
+  points
+    .enter()
+    .append("circle")
+    .attr("class", "continent-point")
+    .attr("r", 3)
+    .attr("fill", d => colorC(d.region))
+    .on("mousemove", (event, d) => {
+      const html = `<b>${d.region}</b><br>Year: ${d.year}<br>${gasType}: ${d3.format(
+        ",.0f"
+      )(d.value)} MtCO₂e`;
+      showTip(html, event);
+    })
+    .on("mouseleave", hideTip)
+    .merge(points)
+    .transition()
+    .duration(600)
+    .attr("cx", d => xC(d.year))
+    .attr("cy", d => yC(d.value));
+
+  points.exit().remove();
+
+  // Create invisible hover circles over the line points
+const hoverCircles = gC.selectAll(".hover-circle")
+  .data(series.flatMap(s => s.values.map(v => ({ region: s.region, ...v }))), d => `${d.region}|${d.year}`);
+
+hoverCircles.enter()
+  .append("circle")
+  .attr("class", "hover-circle")
+  .attr("cx", d => xC(d.year))
+  .attr("cy", d => yC(d.value))
+  .attr("r", 20) // slightly bigger for easier hover
+  .attr("fill", "transparent")
+  .on("mouseenter", (event, d) => {
+    const html = `<b>${d.region}</b><br>Year: ${d.year}<br>${initialGas}: ${d3.format(",.0f")(d.value)} MtCO₂e`;
+    showTip(html, event);
+    
+    // Optionally highlight the line
+    gC.selectAll(".continent-line")
+      .style("opacity", l => l.region === d.region ? 1 : 0.3)
+      .style("stroke-width", l => l.region === d.region ? 4 : 1.5);
+  })
+  .on("mouseleave", (event, d) => {
+    hideTip();
+
+    // Reset lines
+    gC.selectAll(".continent-line")
+      .style("opacity", 1)
+      .style("stroke-width", 2);
+  })
+  .merge(hoverCircles)
+  .transition()
+  .duration(600)
+  .attr("cx", d => xC(d.year))
+  .attr("cy", d => yC(d.value));
+
+hoverCircles.exit().remove();
+
+
+  const lastYear = years[years.length - 1];
+  const labels = gC.selectAll(".line-label")
+    .data(series, d => d.region);
+
+  labels.enter()
+    .append("text")
+    .attr("class", "line-label")
+    .attr("x", d => xC(lastYear) + 12) // slightly further right
+    .attr("y", d => yC(d.values.find(v => v.year === lastYear).value))
+    .attr("font-size", "14px")
+    .attr("fill", d => colorC(d.region))
+    .attr("alignment-baseline", "middle")
+    .attr("font-weight", d => (asiaFocused && d.region === "Asia" ? "bold" : "normal"))
+    .text(d => d.region)
+    .merge(labels)
+    .transition()
+    .duration(600)
+    .attr("x", d => xC(lastYear) + 12)
+    .attr("y", d => yC(d.values.find(v => v.year === lastYear).value))
+    .attr("font-weight", d => (asiaFocused && d.region === "Asia" ? "bold" : "normal"));
+
+  labels.exit().remove();
+
+  // --- Apply Asia focus (also affects line & point styles) ---
+  applyAsiaFocus();
+}
+
+
 
     const initialGas = !gasDropdown.empty()
       ? gasDropdown.property("value")
