@@ -296,6 +296,7 @@ hoverCircles.exit().remove();
 
 
 
+
     const initialGas = !gasDropdown.empty()
       ? gasDropdown.property("value")
       : gasTypes[0];
