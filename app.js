@@ -73,11 +73,11 @@
       .scaleOrdinal()
       .domain(continents)
       .range([
-        "#9b8b6e", // Africa - muted brown
-        "#166534", // Asia - deep green (accent)
-        "#4b6a88", // Europe - dusty blue
-        "#a3dd95ff", // Oceania - soft green
-        "#b3565a"  // Americas - muted red
+        "#dc6abfff", // Africa - muted brown
+        "#8ce8afff", // Asia - deep green (accent)
+        "#719fceff", // Europe - dusty blue
+        "#eeda6aff", // Oceania - soft green
+        "#f28186ff"  // Americas - muted red
       ]);
 
 
