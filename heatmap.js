@@ -107,27 +107,42 @@
       .text(`Total GHG in ${year} (MtCO₂e)`);
 
     // Draw heatmap
-    g.selectAll("rect.heat-cell")
-      .data(industries.flatMap(ind => subregions.map(region => ({ industry: ind, region, value: totals[ind][region] || 0 }))))
-      .enter()
-      .append("rect")
-      .attr("class", "heat-cell")
-      .attr("x", d => x(d.region))
-      .attr("y", d => y(d.industry))
-      .attr("width", x.bandwidth())
-      .attr("height", y.bandwidth())
-      .attr("rx", 4)
-      .attr("ry", 4)
-      .attr("fill", d => d.value ? color(d.value) : "#f8fafc")
-      .on("mousemove", (event, d) => showTip(`<b>${d.industry}</b><br>${d.region}<br>Year: ${year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`, event))
-      .on("mouseleave", hideTip)
-      .on("mouseenter", function(event, d) {
-        const rowR = d.region;
-        const colI = d.industry;
-        g.selectAll(".heat-cell").transition().duration(200).style("opacity", c => c.region === rowR || c.industry === colI ? 1 : 0.15);
-      })
-      .on("mouseleave", function() {
-        g.selectAll(".heat-cell").transition().duration(200).style("opacity", 1);
-      });
+g.selectAll("rect.heat-cell")
+  .data(industries.flatMap(ind => subregions.map(region => ({ industry: ind, region, value: totals[ind][region] || 0 }))))
+  .enter()
+  .append("rect")
+  .attr("class", "heat-cell")
+  .attr("x", d => x(d.region))
+  .attr("y", d => y(d.industry))
+  .attr("width", x.bandwidth())
+  .attr("height", y.bandwidth())
+  .attr("rx", 4)
+  .attr("ry", 4)
+  .attr("fill", d => d.value ? color(d.value) : "#f8fafc")
+  .on("mouseenter", function(event, d) {
+    // Show tooltip
+    showTip(`<b>${d.industry}</b><br>${d.region}<br>Year: ${year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`, event);
+    
+    // Highlight row/column
+    const rowR = d.region;
+    const colI = d.industry;
+    g.selectAll(".heat-cell")
+      .transition().duration(200)
+      .style("opacity", c => c.region === rowR || c.industry === colI ? 1 : 0.15);
+  })
+  .on("mousemove", (event, d) => {
+    // Update tooltip position
+    showTip(`<b>${d.industry}</b><br>${d.region}<br>Year: ${year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`, event);
+  })
+  .on("mouseleave", function() {
+    // Hide tooltip
+    hideTip();
+
+    // Reset heatmap opacity
+    g.selectAll(".heat-cell")
+      .transition().duration(200)
+      .style("opacity", 1);
+  });
+
   });
 })();
