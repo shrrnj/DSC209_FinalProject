@@ -11,33 +11,29 @@
   ];
 
   const svg = d3.select("#asiaBarChart");
-if (svg.empty()) return;
+  if (svg.empty()) return;
 
-const vw = 900;
-const vh = 420;
-const margin = { top: 40, right: 30, bottom: 40, left: 180 };
-const width = vw - margin.left - margin.right;
-const height = vh - margin.top - margin.bottom;
+  const vw = 900;
+  const vh = 420;
+  const margin = { top: 40, right: 30, bottom: 40, left: 180 };
+  const width = vw - margin.left - margin.right;
+  const height = vh - margin.top - margin.bottom;
 
-svg.attr("viewBox", `0 0 ${vw} ${vh}`);
+  svg.attr("viewBox", `0 0 ${vw} ${vh}`);
 
-const g = svg.append("g")
-  .attr("transform", `translate(${margin.left},${margin.top})`);
+  const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
+  svg.on("click", function(event) {
+    if (event.target.tagName === "svg") {
+      g.selectAll(".asia-bar-seg")
+        .transition().duration(300)
+        .style("opacity", 1);
 
-svg.on("click", function(event) {
-  
-  if (event.target.tagName === "svg") {
-    g.selectAll(".asia-bar-seg") 
-      .transition().duration(300)
-      .style("opacity", 1);
+      d3.select("#asiaBarInfo").html("Click a bar to focus on one subregion.");
+    }
+  });
 
-    d3.select("#asiaBarInfo").html("Click a bar to focus on one subregion.");
-  }
-});
-  const gx = g.append("g").attr("class", "axis axis-x")
-    .attr("transform", `translate(0,${height})`);
-
+  const gx = g.append("g").attr("class", "axis axis-x").attr("transform", `translate(0,${height})`);
   const gy = g.append("g").attr("class", "axis axis-y");
 
   const yearText = svg.append("text")
@@ -75,19 +71,24 @@ svg.on("click", function(event) {
 
   d3.csv(FILE, d3.autoType).then(data => {
     const filtered = data.filter(
-      d =>
-        d["Gas Type"] === "Greenhouse gas" &&
-        subregions.includes((d.Country || "").trim())
+      d => d["Gas Type"] === "Greenhouse gas" && subregions.includes((d.Country || "").trim())
     );
 
     const yearCols = Object.keys(data[0]).filter(k => /^\d{4}$/.test(k));
     const years = yearCols.map(Number).sort((a, b) => a - b);
 
+    // Get all unique industries
     const industrySet = new Set();
-    filtered.forEach(d => {
-      if (d.Industry) industrySet.add(d.Industry);
-    });
+    filtered.forEach(d => { if (d.Industry) industrySet.add(d.Industry); });
     const industries = Array.from(industrySet).sort();
+
+    // Consistent color mapping for all industries
+    const color = d3.scaleOrdinal()
+      .domain(industries)
+      .range([
+        "#faff64ff", "#b97bbfff", "#fc5c00ff", "#264a20ff",
+        "#906a51ff", "#095891ff"
+      ]);
 
     const totalsByYear = {};
     let globalMaxTotal = 0;
@@ -120,24 +121,6 @@ svg.on("click", function(event) {
     const x = d3.scaleLinear().domain([0, globalMaxTotal]).range([0, width]);
     const y = d3.scaleBand().domain(subregions).range([0, height]).padding(0.35);
 
-    const color = d3.scaleOrdinal()
-  .domain(industries)
-  .range([
-    "#000000ff", 
-    "#faff64ff", 
-    "#b97bbfff", 
-    "#fc5c00ff", 
-    "#264a20ff", 
-    "#906a51ff", 
-    "#095891ff", 
-    "#c0c0c0ff",
-    "#bf228dff", 
-    "#7db987ff",
-  ]);
-
-
-
-
     gx.call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".2s")));
     gy.call(d3.axisLeft(y));
 
@@ -150,23 +133,18 @@ svg.on("click", function(event) {
       .text("Total GHG emissions (MtCO₂e)");
 
     const legendWrap = d3.select("#asiaBarLegend");
-    function drawLegend() {
-      const items = legendWrap.selectAll(".item").data(industries, d => d);
+
+    function drawLegend(industriesToShow) {
+      const items = legendWrap.selectAll(".item").data(industriesToShow, d => d);
       const enter = items.enter().append("div").attr("class", "item");
-
-      enter.append("span")
-        .attr("class", "sw")
-        .style("background", d => color(d));
-
+      enter.append("span").attr("class", "sw").style("background", d => color(d));
       enter.append("span").text(d => d);
-
       items.exit().remove();
     }
-    drawLegend();
 
     let segments = g.selectAll("rect.asia-bar-seg");
 
-    function buildSegments(year) {
+    function buildSegments(year, topIndustries) {
       const bySub = totalsByYear[year] || new Map();
       const segs = [];
 
@@ -176,22 +154,14 @@ svg.on("click", function(event) {
         if (!total) return;
 
         let cum = 0;
-        industries.forEach(ind => {
+        topIndustries.forEach(ind => {
           const v = m.get(ind) || 0;
           if (!v) return;
           const x0 = cum;
           const x1 = cum + v;
           cum = x1;
 
-          segs.push({
-            region,
-            industry: ind,
-            value: v,
-            total,
-            x0,
-            x1,
-            year
-          });
+          segs.push({ region, industry: ind, value: v, total, x0, x1, year });
         });
       });
 
@@ -201,61 +171,59 @@ svg.on("click", function(event) {
     function render(year, animate = true) {
       yearText.text(`Year: ${year}`);
 
-      const dataSegs = buildSegments(year);
+      // Get top 5 industries across all subregions for this year
+      const bySub = totalsByYear[year] || new Map();
+      const industryTotals = new Map();
+      subregions.forEach(region => {
+        const m = bySub.get(region) || new Map();
+        m.forEach((val, ind) => industryTotals.set(ind, (industryTotals.get(ind) || 0) + val));
+      });
+
+      const top5Industries = Array.from(industryTotals.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(d => d[0]);
+
+      // Update legend
+      drawLegend(top5Industries);
+
+      const dataSegs = buildSegments(year, top5Industries);
       const t = animate ? g.transition().duration(700).ease(d3.easeCubicInOut) : g;
 
-      segments = segments.data(
-        dataSegs,
-        d => `${d.region}|${d.industry}`
-      );
+      segments = segments.data(dataSegs, d => `${d.region}|${d.industry}`);
 
       segments.enter()
-  .append("rect")
-  .attr("class", "asia-bar-seg")
-  .attr("y", d => y(d.region))
-  .attr("height", y.bandwidth())
-  .attr("x", d => x(d.x0))
-  .attr("width", d => x(d.x1) - x(d.x0))
-  .attr("fill", d => color(d.industry))
-  .attr("opacity", 0.9)
-  .on("mousemove", (event, d) => {
-    const html = `<b>${d.region}</b><br>
-                  Industry: <b>${d.industry}</b><br>
-                  Year: ${d.year}<br>
-                  Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`;
-    showTip(html, event);
-  })
-  .on("mouseleave", hideTip)
+        .append("rect")
+        .attr("class", "asia-bar-seg")
+        .attr("y", d => y(d.region))
+        .attr("height", y.bandwidth())
+        .attr("x", d => x(d.x0))
+        .attr("width", d => x(d.x1) - x(d.x0))
+        .attr("fill", d => color(d.industry))
+        .attr("opacity", 0.9)
+        .on("mousemove", (event, d) => {
+          const html = `<b>${d.region}</b><br>Industry: <b>${d.industry}</b><br>Year: ${d.year}<br>Emissions: ${d3.format(",.0f")(d.value)} MtCO₂e`;
+          showTip(html, event);
+        })
+        .on("mouseleave", hideTip)
+        .on("click", (event, d) => {
+          const sub = d.region;
+          g.selectAll(".asia-bar-seg")
+            .transition().duration(300)
+            .style("opacity", seg => seg.region === sub ? 1 : 0.25);
 
-  .on("click", (event, d) => {
-    const sub = d.region;
+          d3.select("#asiaBarInfo").html(`<strong>Focused on: ${sub}</strong><br>Click empty space to reset.`);
+          event.stopPropagation();
+        })
+        .merge(segments)
+        .transition(t)
+        .attr("y", d => y(d.region))
+        .attr("height", y.bandwidth())
+        .attr("x", d => x(d.x0))
+        .attr("width", d => x(d.x1) - x(d.x0));
 
-    g.selectAll(".asia-bar-seg")
-      .transition().duration(300)
-      .style("opacity", seg => seg.region === sub ? 1 : 0.25);
-
-    d3.select("#asiaBarInfo").html(`
-      <strong>Focused on: ${sub}</strong><br>
-      Click empty space to reset.
-    `);
-
-    event.stopPropagation();
-  })
-
-  .merge(segments)
-  .transition(t)
-  .attr("y", d => y(d.region))
-  .attr("height", y.bandwidth())
-  .attr("x", d => x(d.x0))
-  .attr("width", d => x(d.x1) - x(d.x0));
-
-segments.exit()
-  .transition()
-  .duration(300)
-  .attr("opacity", 0)
-  .remove();
-
-  }
+      segments.exit().transition().duration(300).attr("opacity", 0).remove();
+    }
 
     const playBtn = d3.select("#asiaBarPlay");
     const pauseBtn = d3.select("#asiaBarPause");
@@ -264,8 +232,7 @@ segments.exit()
     let currentYearIndex = 0;
     let timer = null;
 
-    // 🔹 Expose a global function for the year slider control
-    window.updateAsiaBars = function (year) {
+    window.updateAsiaBars = function(year) {
       const yVal = +year;
       if (!years.includes(yVal)) return;
       render(yVal, false);
